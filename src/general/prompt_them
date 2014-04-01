@@ -121,7 +121,7 @@ do
    $ESTDIR/bin/na_record -f 16000 -time $duration -o wav/$f.wav
    echo ... end recording
 
-   POSITION=$[$POSITION+1]
+   POSITION=`echo $POSITION | awk '{printf("%d",$1+1)}'`
 
    # If you don't want to hear the review comment out the following lines
 #   echo Review $f

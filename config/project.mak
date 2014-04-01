@@ -2,7 +2,7 @@
 ##                                                                       ##
 ##                   Carnegie Mellon University and                      ##
 ##                   Alan W Black and Kevin A. Lenzo                     ##
-##                      Copyright (c) 1998-2001                          ##
+##                      Copyright (c) 1998-2011                          ##
 ##                        All Rights Reserved.                           ##
 ##                                                                       ##
 ##  Permission is hereby granted, free of charge, to use and distribute  ##
@@ -37,6 +37,6 @@
 
 PROJECT_NAME = Building Voices in Festival
 PROJECT_PREFIX = festvox
-PROJECT_VERSION = 2.1
-PROJECT_DATE = Jan 2007
-PROJECT_STATE = release
+PROJECT_VERSION = 2.6.0
+PROJECT_DATE = Jan 2013
+PROJECT_STATE = current

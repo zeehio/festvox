@@ -304,7 +304,7 @@ void dmatfree(double **mat, int row)
     xfree(mat);
 }
 
-char *strclone(char *string)
+char *strclone(const char *string)
 {
     char *buf;
 

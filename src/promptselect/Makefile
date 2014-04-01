@@ -35,7 +35,8 @@
 TOP=../../
 DIRNAME=src/promptselect
 SCHEMEFILES = text2utts.scm
-SCRIPTS = dataset_minus dataset_subset dataset_select make_nice_prompts
+SCRIPTS = dataset_minus dataset_subset dataset_select make_nice_prompts \
+          find_oovs find_gpos
 OTHERS = 
 
 FILES = Makefile $(SCRIPTS) $(SCHEMEFILES) $(OTHERS)

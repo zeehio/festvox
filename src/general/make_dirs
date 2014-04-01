@@ -31,10 +31,10 @@
 ##  THIS SOFTWARE.                                                       ##
 ##                                                                       ##
 ###########################################################################
-###                                                                       ##
-###  Make the directories assumes . is the db directory                   ##
-###                                                                       ##
-############################################################################
+##                                                                       ##
+##  Make the directories assumes . is the db directory                   ##
+##                                                                       ##
+###########################################################################
 
 ##
 ##  This makes more directories than you may need
@@ -55,17 +55,9 @@ mkdir wrd
 mkdir syl
 mkdir phr
 mkdir f0
-mkdir dic
 mkdir etc
 mkdir group
 mkdir festival
-mkdir festival/relations
-mkdir festival/relations/Segment
-mkdir festival/relations/Phrase
-mkdir festival/relations/Target
-mkdir festival/relations/Syllable
-mkdir festival/relations/Word
-mkdir festival/relations/IntEvent
 mkdir festival/utts
 mkdir festival/coeffs
 mkdir festival/f0
@@ -75,7 +67,6 @@ mkdir festival/feats
 mkdir festival/clunits
 mkdir festival/phrbrk
 mkdir festival/dur
-mkdir festival/accents
 mkdir emu
 mkdir emu/lab_hlb
 mkdir emu/pm_hlb

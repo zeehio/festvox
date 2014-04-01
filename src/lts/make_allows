@@ -94,7 +94,7 @@ do
      awk '{t += $2;
            if (NR < 3)
               printf("%s\n",$1);
-           else if (t < 0.9)
+           else if (t < 0.8)
               printf("%s\n",$1);}'
    echo ")"
 done

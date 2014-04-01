@@ -7,6 +7,10 @@ which include substantial new content.
 
 Thanks goes to
 
+Richard Sproat (UIUC)
+   Who contribute unitrans for translating unicode characters into
+   probably phoneme sequences, used in the grapheme based builds
+   Their works is released under an apache free software license.
 Raj Reddy:
    for inviting AWB to CMU to allow him to work with KAL
 CMU:
@@ -16,7 +20,8 @@ Edinburgh University:
    making it well-designed, stable and portable.  Also for the basic
    config setup (which RJC wrote).  
 Cepstral, LLC (www.cepstral.com)
-   Who have provided bug fixes, corrections and improvements.
+   Who have provided bug fixes, corrections and improvements, in early
+   versions of this work.
 US National Science Foundation
    Who funded part of the work on automatic labelling, and evaluation
    protocols

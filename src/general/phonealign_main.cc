@@ -291,7 +291,7 @@ static void map_relation(const EST_Track &itrack,
     copy_relation(ilabel,olabel);
 
     // Map the end feature values
-    for (i=olabel.head(); i != 0; i=next(i))
+    for (i=olabel.head(); i != 0; i=next_item(i))
     {
 	end = i->F("end");
 	thisi = itrack.index(end);

@@ -2,7 +2,7 @@
 ##                                                                       ##
 ##                  Language Technologies Institute                      ##
 ##                     Carnegie Mellon University                        ##
-##                      Copyright (c) 2003-2004                          ##
+##                      Copyright (c) 2003-2007                          ##
 ##                        All Rights Reserved.                           ##
 ##                                                                       ##
 ##  Permission is hereby granted, free of charge, to use and distribute  ##
@@ -45,8 +45,8 @@ TOP=../../
 DIRNAME=src/hts_build
 BUILD_DIRS = 
 ALL_DIRS= data train $(BUILD_DIRS)
-SCHEMEFILES = VOICE_hts.scm
-SCRIPTS = build_hts
+SCHEMEFILES = VOICE_hts.scm VOICE_2.0_hts.scm
+SCRIPTS = build_hts do_hts
 OTHERS = f0range
 
 FILES = Makefile $(SCRIPTS) $(SCHEMEFILES) $(OTHERS)

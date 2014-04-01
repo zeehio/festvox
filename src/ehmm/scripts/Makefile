@@ -44,8 +44,8 @@ DIRNAME=src/ehmm/scripts
 BUILD_DIRS = 
 ALL_DIRS = $(BUILD_DIRS)
 SCRIPTS = comp_dcep.pl phfromutt.pl scale_feat.pl sym2nm.pl \
-          getwavlist.pl seqproc.pl do_ehmm check_lab.pl sl2nm.pl \
-          rem_ssil.pl
+          seqproc.pl do_ehmm check_lab.pl sl2nm.pl \
+          rem_ssil.pl rm_nan_utts
 SCM = phseq.scm
 FILES = Makefile $(SCRIPTS) $(SCM)
 

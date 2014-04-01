@@ -52,7 +52,7 @@ set tempo = $src_dir/tempo/tempo
 ##############################
 set wav_dir = $work_dir/wav
 set f0_dir = $work_dir/f0
-set uf0 = 600
+set uf0 = 300
 set lf0 = 70
 ##############################
 
@@ -61,10 +61,10 @@ foreach flbl (`cat $list`)
 	set f0f = $f0_dir/$flbl.f0
         echo $f0f
 	if (!(-r $f0f)) then
-		if (-r $tempo) then
-			echo $tempo -nmsg -uf0 $uf0 -lf0 $lf0 $wavf $f0f
-			$tempo -nmsg -uf0 $uf0 -lf0 $lf0 $wavf $f0f
-		else
+#		if (-r $tempo) then
+#			echo $tempo -nmsg -uf0 $uf0 -lf0 $lf0 $wavf $f0f
+#			$tempo -nmsg -uf0 $uf0 -lf0 $lf0 $wavf $f0f
+#		else
 			mkdir -p $f0f:h
 			$ESTDIR/bin/pda \
 				$wavf \
@@ -72,7 +72,7 @@ foreach flbl (`cat $list`)
 				-fmin $lf0 \
 				-fmax $uf0 \
 				-L
-		endif
+#		endif
 	endif
 	if (!(-r $f0f)) then
 		echo ERROR > DUMMY-ERROR-LOG

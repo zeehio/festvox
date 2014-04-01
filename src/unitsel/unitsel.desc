@@ -163,14 +163,14 @@ onset
 0
 1
 )
-( R:SylStructure.parent.syl_break
+( R:SylStructure.parent.lisp_cg_break
 0
 1
 2
 3
 4
 )
-( R:SylStructure.parent.R:Syllable.p.syl_break
+( R:SylStructure.parent.R:Syllable.p.lisp_cg_break
 0
 1
 2

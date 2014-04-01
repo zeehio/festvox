@@ -39,6 +39,8 @@
 ##  Will do alignment if they aren't the same size                       ##
 ###########################################################################
 
+LANG=C; export LANG
+
 if [ ! "$ESTDIR" ]
 then
    echo "environment variable ESTDIR is unset"
@@ -66,21 +68,29 @@ then
    exit 0
 fi
 
+ORDER=26
+ORDERD=2
+if [ $# = 4 ]
+then
+   ORDER=$3
+   ORDERD=$4
+fi
+
 CH_TRACK=$ESTDIR/bin/ch_track
 PHONEALIGN=$FESTVOXDIR/src/general/phonealign
 
 TRACK1=$1
-TRACK1_CHANNELS=`$ESTDIR/bin/ch_track -info $1 | grep "Number of channels" | awk '{print $NF}'`
+TRACK1_CHANNELS=`$ESTDIR/bin/ch_track -info $1 | grep "Number of channels" | awk '{print $NF/'$ORDERD'}'`
 TRACK1_FRAMES=`$ESTDIR/bin/ch_track -info $1 | grep "Number of frames" | awk '{print $NF}'`
 TRACK2=$2
 TRACK2_CHANNELS=`$ESTDIR/bin/ch_track -info $2 | grep "Number of channels" | awk '{print $NF}'`
 TRACK2_FRAMES=`$ESTDIR/bin/ch_track -info $2 | grep "Number of frames" | awk '{print $NF}'`
 
-if [ $TRACK1_CHANNELS != $TRACK2_CHANNELS ]
-then
-   echo "Tracks have different number of channels $TRACK1_CHANNELS $TRACK2_CHANNELS"
-   exit 1
-fi
+#if [ $TRACK1_CHANNELS != $TRACK2_CHANNELS ]
+#then
+#   echo "Tracks have different number of channels $TRACK1_CHANNELS $TRACK2_CHANNELS"
+#   exit 1
+#fi
 
 if [ $TRACK1_FRAMES != $TRACK2_FRAMES ]
 then
@@ -99,25 +109,23 @@ then
 fi
 
 ## Calculates differences
-$ESTDIR/bin/ch_track -otype ascii $TRACK1 >actual.mcep
-$ESTDIR/bin/ch_track -otype ascii $TRACK2 >test.mcep
-paste actual.mcep test.mcep |
+$ESTDIR/bin/ch_track -otype ascii $TRACK1 |
+awk '{print $1}' >actual.$$.mcep
+$ESTDIR/bin/ch_track -otype ascii $TRACK2 |
+awk '{print $1}' >test.$$.mcep
+paste actual.$$.mcep test.$$.mcep |
 awk '{t=0;
       if (channels == 0)
          channels = NF;
       if (channels == NF)
       {
-         for (i=1; i<NF/2; i++)
-         {
-            d = ($i-$(i+NF/2));
-            if (d < 0)
-               d = -1 * d;
-            printf("%f ",d*d);
-         }
+         d = ($1-$2);
+         if (d < 0)
+            d = -1 * d;
+         printf("%f\n",d);
       }
-      printf("\n")
       }' |
-   tee mcep.diff |
+   tee mcep.$$.diff |
    awk '{ num_channels = NF;
           for (i=1; i<=1; i++)
           {
@@ -136,10 +144,10 @@ awk '{t=0;
      }
      function mean (sum,n) { return sum/n; }
      END {
-        printf "mean %3.3f std %3.3f var %3.3f rms %3.3f n %d\n",sqrt(mean(sumall,countall)),std(sumall,sumsqall,countall),std(sumall,sumsqall,countall)*std(sumall,sumsqall,countall),sqrt(sumsqall/countall),countall
+        printf "mean %3.3f std %3.3f var %3.3f rms %3.3f n %d\n",mean(sumall,countall),std(sumall,sumsqall,countall),std(sumall,sumsqall,countall)*std(sumall,sumsqall,countall),sqrt(sumsqall/countall),countall
      }'
 
-rm -f mcep.diff actual.mcep test.mcep
+rm -f mcep.$$.diff actual.$$.mcep test.$$.mcep
 
 exit 0
 

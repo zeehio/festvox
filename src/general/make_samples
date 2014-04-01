@@ -38,7 +38,7 @@
 
 LANG=C; export LANG
 
-if [ $# == 0 ]
+if [ $# = 0 ]
 then
     echo ./bin/make_samples TESTNAME [TESTSET]
     echo e.g. ./bin/make_samples test3 etc/test.data

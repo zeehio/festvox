@@ -133,5 +133,41 @@ fi
 echo Edinburgh Speech Tools found in $ESTDIR
 AC_SUBST(ESTDIR)
 
+dnl Add support to check for thread support
+NOPTHREADFLAGS=""
+multithreading=true
+AC_ARG_ENABLE( multithreading,
+               [  --disable-multithreading	build without multithreading support],
+               [ multithreading=false ])
+
+if test "x$multithreading" = xtrue; then
+  have_pthreads=no
+  AC_SEARCH_LIBS([pthread_create], [pthread],
+    [have_pthreads=yes])
+
+  if test "x${have_pthreads}" = xyes; then
+    AC_CHECK_HEADER([pthread.h], [],
+      [have_pthreads=no])
+  fi
+
+  if test "x${have_pthreads}" = xno; then
+    echo "------------------------------------------"
+    echo " Unable to find pthread on this system.  "
+    echo " Building a single-threaded version.      "
+    echo "------------------------------------------"
+
+    NOPTHREADFLAGS="${NOPTHREADFLAGS} -DFESTVOX_NO_THREADS"
+
+  fi
+else
+  NOPTHREADFLAGS="${NOPTHREADFLAGS} -DFESTVOX_NO_THREADS"
+  echo "------------------------------------------"
+  echo " Multithreading support disabled.         "
+  echo "                                          " 
+  echo " Run without --disable-multithreading     "
+  echo " if you want thread support               "
+  echo "------------------------------------------"
+fi dnl test for multithreading
+AC_SUBST(NOPTHREADFLAGS)
 
 AC_OUTPUT(config/config)

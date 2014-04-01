@@ -1070,7 +1070,7 @@ cues even if the prompts are not actually played.  The files are also
 used in aligning the spoken data.
 
 <blockquote><literallayout>
-festival -b festvox/build_clunits.scm '(build_prompts "etc/uniphone.data")'
+festival -b festvox/build_clunits.scm '(build_prompts_waves "etc/uniphone.data")'
 </literallayout></blockquote>
 
 Use whatever prompt file you are intending to use.  Note that you may

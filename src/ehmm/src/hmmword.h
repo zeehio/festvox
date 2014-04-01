@@ -37,48 +37,44 @@
 /*            Purpose: A state class for HMM implementation              */
 /*                                                                       */
 /*************************************************************************/
-#ifndef include
- #define include
- #include "header.h"
-#endif
+#ifndef SRC_EHMM_SRC_HMMWORD_H_
+#define SRC_EHMM_SRC_HMMWORD_H_
 
 class wrdC {
-  
-  public: 	
+ public:
+  int bst;  // begining state number
+  int est;  // ending state number
+  int nst;  // no of states
+  int wid;  // word id
+  char nm[kNmLimit];
 
-     int bst;  //begining state number	  
-     int est;  //ending state number
-     int nst;  //no of states
-     int wid;  //word id
-     char nm[nmL];
-     
-     wrdC();
-     void init(int, int, int, int, char*);  
-     int getbst();
-     int getest();
-     int getnst();
+  wrdC();
+  void init(int, int, int, int, char*);
+  int getbst();
+  int getest();
+  int getnst();
 };
 
-int wrdC::getbst() { 
+int wrdC::getbst() {
   return bst;
 }
 
-int wrdC::getest() { 
+int wrdC::getest() {
   return est;
 }
 
-int wrdC::getnst() { 
+int wrdC::getnst() {
   return nst;
 }
 
 wrdC::wrdC() {
-
 }
 void wrdC::init(int t_bst, int t_est, int t_nst, int t_wid, char *t_nm) {
-   
-   bst = t_bst;	
-   est = t_est;
-   nst = t_nst;
-   wid = t_wid;
-   strcpy(nm, t_nm);
+  bst = t_bst;
+  est = t_est;
+  nst = t_nst;
+  wid = t_wid;
+  strcpy(nm, t_nm);
 }
+
+#endif  // SRC_EHMM_SRC_HMMWORD_H_

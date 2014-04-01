@@ -91,7 +91,8 @@ awk '{if ((NR > 1) && (phone != $2))
      {
         for (let in freq)
         {
-            printf("%s %s %f\n",let,phone,freq[let]/(1.0*tp));
+            if (tp > 0)
+               printf("%s %s %f\n",let,phone,freq[let]/(1.0*tp));
         }
         delete freq
         tp=0;
@@ -136,7 +137,7 @@ awk 'BEGIN { printf("(require '"'"'lts_build)\n");
           probmass = 0.0;
           l = $1;
        }
-       if ((lc < 10) || (probmass < 0.50))
+       if ((lc < 80) || (probmass < 0.80))
           printf("      %s\n",$2);
        probmass += $4;
        lc++;

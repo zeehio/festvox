@@ -48,9 +48,9 @@
 #include "cst_track.h"
 #include "cst_sigpr.h"
 
-#define PT_LPC_PARAMS_START 15
+#define PT_LPC_PARAMS_START 3
 #define PT_NUM_LPC_PARAMS 16
-#define PT_RESSIZE 14
+#define PT_RESSIZE 2
 #define PT_RESSTART (PT_LPC_PARAMS_START+PT_NUM_LPC_PARAMS)
 
 int main(int argc, char **argv)
@@ -59,6 +59,7 @@ int main(int argc, char **argv)
     cst_lpcres *lpcres;
     int samples, i, j, r, start;
     cst_wave *wav;
+    float ptime;
 
     lpcres = new_lpcres();
     param_track = new_track();
@@ -67,23 +68,30 @@ int main(int argc, char **argv)
     lpcres = new_lpcres();
     lpcres_resize_frames(lpcres,param_track->num_frames);
     lpcres->num_channels = PT_NUM_LPC_PARAMS;
-    lpcres->lpc_min = -10.845083;
-    lpcres->lpc_range = 21.578271;
+    lpcres->lpc_min = -12.206278;
+    lpcres->lpc_range =  17.588343;
     lpcres->sample_rate = 16000;
 
+    ptime = 0.0;
     for (i=0; i<param_track->num_frames; i++)
     {
         lpcres->frames[i] = cst_alloc(unsigned short,PT_NUM_LPC_PARAMS);
         for (j=0; j<PT_NUM_LPC_PARAMS; j++)
             lpcres->frames[i][j] = 
                 param_track->frames[i][PT_LPC_PARAMS_START+j];
+        lpcres->sizes[i] = param_track->frames[i][PT_RESSIZE];
+#if 0
+        lpcres->sizes[i] = 
+            (int)(((float)lpcres->sample_rate)*(param_track->times[i]-ptime));
+        ptime = param_track->times[i];
+#endif
 #if 0
         if (param_track->frames[i][0] > 0)
             lpcres->sizes[i] = 
                 (int)(((float)lpcres->sample_rate)/param_track->frames[i][0]);
         else
-#endif
             lpcres->sizes[i] = param_track->frames[i][PT_RESSIZE];
+#endif
     }
 
     for (samples=0,i=0; i<lpcres->num_frames; i++)
@@ -92,11 +100,16 @@ int main(int argc, char **argv)
     start = 0;
     samples += start;
     
-    lpcres_resize_samples(lpcres,samples);
+    lpcres_resize_samples(lpcres,samples*2);
     for (r=start,i=0; i<lpcres->num_frames; i++)
     {
 	for (j=0; j<lpcres->sizes[i]; j++,r++)
-	    lpcres->residual[r] = param_track->frames[i][PT_RESSTART+j];
+        {
+            if (j < 256)
+                lpcres->residual[r] = param_track->frames[i][PT_RESSTART+j];
+            else
+                lpcres->residual[r] = 255;
+        }
     }
 
     wav = lpc_resynth(lpcres);

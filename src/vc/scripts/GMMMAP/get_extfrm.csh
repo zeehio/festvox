@@ -59,6 +59,7 @@ set lp = -20
 @ dim = $order + $order
 
 foreach flbl (`cat $list`)
+        echo $flbl
 	set npowf = $npow_dir/$flbl.npow
 	set sdmcepf = $mcep_dir/$flbl.sd$ext
 	set exmcepf = $mcep_dir/$flbl.ex$ext

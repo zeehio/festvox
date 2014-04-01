@@ -76,7 +76,7 @@ do
        awk '{if ($6 == "'$i'") print $0}' >ltsdataTRAIN.$i.feats
    fi
 
-   wagon -data ltsdataTRAIN.$i.feats -test ltsdataTRAIN.$i.feats \
+   $ESTDIR/bin/wagon -data ltsdataTRAIN.$i.feats -test ltsdataTRAIN.$i.feats \
           -desc ltsLTS.desc -stop $STOP -output lts.$i.tree
 
 done

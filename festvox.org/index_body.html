@@ -1,0 +1,107 @@
+<!-- start of page body -->
+<td width="80%" valign="TOP">
+  <table width="100%" border="0" cellspacing="2" cellpadding="5">
+    <tr><td>
+    <TABLE BORDER=0 WIDTH=100% CELLPADDING=0 CELLSPACING=0> <TR> <TD BGCOLOR=#000000 HEIGHT=1><TABLE BORDER=0 WIDTH=100% CELLPADDING=0 CELLSPACING=0><TR><TD></TD></TR></TABLE></TD> </TR> </TABLE>
+    <TABLE BORDER=0 WIDTH=100% CELLPADDING=2 CELLSPACING=0>
+      <TR><td bgcolor="#EEEED4">
+      <b>Welcome to festvox.org</b>
+      </TD></tr>
+    </TABLE>
+    <TABLE BORDER=0 WIDTH=100% CELLPADDING=0 CELLSPACING=0> <TR> <TD BGCOLOR=#000000 HEIGHT=1><TABLE BORDER=0 WIDTH=100% CELLPADDING=0 CELLSPACING=0><TR><TD></TD></TR></TABLE></TD> </TR> </TABLE>
+    <table width="100%" border="0" cellpadding="10"><tr><td>
+      This project is part of the work at
+      <A HREF="http://www.speech.cs.cmu.edu/">Carnegie Mellon
+      University's speech group</A> aimed at advancing the state of Speech Synthesis.
+      <P>
+      <ul>
+      <li>
+      <strong>November 2010</strong>: <A HREF="http://festvox.org/packed/festival/2.1/">Festival 2.1 released</A>
+
+A surprising official new version of Festival is released.  Updating
+support for various machines and merging the support for HTS,
+Clustergen, Multisyn and Clunit voices.
+
+      </li>
+      <li>
+      <strong>Jan 21st 2007</strong>: <A HREF="http://festvox.org/bsv/">Festvox-2.1 Release</A>
+
+Festvox-2.1 has been released.  New with this release is Clustergen
+Statistical Parametric Synthesis support, EHMM acoustic labeler (no
+longer dependent on Sphinx) Thanks to Kishore, Voice Conversion
+support (thanks to Tomoki Toda), and cygwin support.  See <a
+href="http://festvox.org/bsv/ANNOUNCE-2.1">ANNOUNCE-2.1</a> for more
+details.
+
+      </li>
+      </ul>
+      <p>
+      The Festvox project aims to make the building of new synthetic
+      voices more systemic and better documented, making it possible 
+      for anyone to build a new voice.  Specifically we offer:
+      <UL>
+      <li><A HREF="festvox/festvox_toc.html">Documentation</A>, including scripts 
+      explaining the background and specifics for building new voices for
+      speech synthesis in new and supported languages.</li>
+      <li>Specific scripts to build new voices in supported languages,
+      such as US and UK English.</li>
+      <li>Aids to building synthetic voices for 
+      <A HREF="ldom/index.html">limited domains</a></li>
+      <li><A HREF="dbs/index.html">Example speech databases</A>
+      to help building new voices.</li>
+      <li>Links, demos and a repository for new voices</li>
+      </ul>
+      The documentation, tools and dependent software are all free without
+      restriction (commercial or otherwise).  Licencing of voices built 
+      by these techniques are the responsibility of the builders.
+      <P>
+      This work is firmly grounded within Edinburgh University's 
+      <A HREF="http://www.cstr.ed.ac.uk/projects/festival/">
+      Festival Speech Synthesis System</A> and 
+      Carnegie Mellon University's <A HREF="http://cmuflite.org">
+      small footprint Flite synthesis engine</A>
+      <p>
+      This work has been supported be various groups including,
+      Carnegie Mellon University, the US National Science Foundation
+      (NSF), and US Defense Advanced Research Projects Agency (DARPA).
+      <p>
+    </td></tr></table>
+    <TABLE BORDER=0 WIDTH=100% CELLPADDING=0 CELLSPACING=0> <TR> <TD BGCOLOR=#000000 HEIGHT=1><TABLE BORDER=0 WIDTH=100% CELLPADDING=0 CELLSPACING=0><TR><TD></TD></TR></TABLE></TD> </TR> </TABLE>
+    <TABLE BORDER=0 WIDTH=100% CELLPADDING=2 CELLSPACING=0>
+      <TR><td bgcolor="#EEEED4">
+      <b>Requirements for building a voice</b>
+      </TD></tr>
+    </TABLE>
+    <TABLE BORDER=0 WIDTH=100% CELLPADDING=0 CELLSPACING=0> <TR> <TD BGCOLOR=#000000 HEIGHT=1><TABLE BORDER=0 WIDTH=100% CELLPADDING=0 CELLSPACING=0><TR><TD></TD></TR></TABLE></TD> </TR> </TABLE>
+    <table width="100%" border="0" cellpadding="10"><tr><td>
+      Note the techniques and processes described here do not guarantee
+      that you'll end up with a high quality acceptable voice, but with a 
+      little care you can likely build a new synthesis voice in a supported
+      language in a few days, or in a new language in a few weeks (more or
+      less depending on the complexity of the language, and the desired
+      quality).
+      <p>
+      You will need:
+      <ul>
+      <li>To read the <A HREF="festvox/festvox_toc.html">documentation</A></li>
+      <li>A Unix machine (e.g. Linux, FreeBSD, Solaris, etc) with working
+      audio i/o.  This may work on other platforms but many scripts,
+      perhaps unnecessarily, depend on Unix utilties like,
+      <tt>awk</tt>, <tt>sed</tt> etc.</li>
+      <li>Installed versions of Edinburgh University's
+      <A HREF="http://festvox.org/festival/downloads.html">
+      Festival Speech Synthesis System</A> and 
+      <A HREF="http://festvox.org/festival/downloads.html">
+      Edinburgh Speech Tools</A> (distributed with Festival).</li>
+      <li>A waveform viewing/labeling program like 
+      <tt>emulabel</tt> distributed as part of Macquarie University's
+      <A HREF="http://www.shlrc.mq.edu.au/emu/">EMU speech database
+      system</A>.  Although automatic labeling software is included in
+      festvox, a display tool is necessary for diagnosis and debugging.</li>
+      <li>Patience and care, and a little interest in the subject of speech
+      technology.</li>
+      </ul>
+    </td></tr></table>
+    </td></tr>
+  </table>
+</td>

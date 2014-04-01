@@ -37,7 +37,7 @@
 TOP=../../
 DIRNAME=src/ldom
 SCRIPTS = build_ldom setup_ldom
-GENSCMFILES = LDOM_ldom.scm build_ldom.scm LDOM-mode.scm
+GENSCMFILES = LDOM_ldom.scm build_ldom.scm
 # these'll get deleted sometime
 OLDSCMFILES = LDOM-mode.scm
 EXAMPLESCMFILES = time.scm tel.scm jtime.scm

@@ -38,6 +38,8 @@
 ##  MCEP distortion (Toda 2004 SSW5)                                     ##
 ###########################################################################
 
+LANG=C; export LANG
+
 if [ ! "$ESTDIR" ]
 then
    echo "environment variable ESTDIR is unset"
@@ -68,18 +70,26 @@ fi
 CH_TRACK=$ESTDIR/bin/ch_track
 PHONEALIGN=$FESTVOXDIR/src/general/phonealign
 
+ORDER=26
+ORDERD=2
+if [ $# = 4 ]
+then
+   ORDER=$3
+   ORDERD=$4
+fi
+
 TRACK1=$1
-TRACK1_CHANNELS=`$ESTDIR/bin/ch_track -info $1 | grep "Number of channels" | awk '{print $NF}'`
+TRACK1_CHANNELS=`$ESTDIR/bin/ch_track -info $1 | grep "Number of channels" | awk '{print $NF/'$ORDERD'}'`
 TRACK1_FRAMES=`$ESTDIR/bin/ch_track -info $1 | grep "Number of frames" | awk '{print $NF}'`
 TRACK2=$2
 TRACK2_CHANNELS=`$ESTDIR/bin/ch_track -info $2 | grep "Number of channels" | awk '{print $NF}'`
 TRACK2_FRAMES=`$ESTDIR/bin/ch_track -info $2 | grep "Number of frames" | awk '{print $NF}'`
 
-if [ $TRACK1_CHANNELS != $TRACK2_CHANNELS ]
-then
-   echo "Tracks have different number of channels $TRACK1_CHANNELS $TRACK2_CHANNELS"
-   exit 1
-fi
+#if [ $TRACK1_CHANNELS != $TRACK2_CHANNELS ]
+#then
+#   echo "Tracks have different number of channels $TRACK1_CHANNELS $TRACK2_CHANNELS"
+#   exit 1
+#fi
 
 if [ $TRACK1_FRAMES != $TRACK2_FRAMES ]
 then
@@ -98,9 +108,16 @@ then
 fi
 
 ## Calculates differences
-$ESTDIR/bin/ch_track -otype ascii $TRACK1 >actual.mcep
-$ESTDIR/bin/ch_track -otype ascii $TRACK2 >test.mcep
-paste actual.mcep test.mcep |
+$ESTDIR/bin/ch_track -otype ascii $TRACK1 |
+awk '{for (i=1; i<= '$ORDER'; i++)
+         printf("%s ",$i);
+      printf("\n");}' >actual.$$.mcep
+$ESTDIR/bin/ch_track -otype ascii $TRACK2 |
+awk '{for (i=1; i<= '$ORDER'; i++)
+         printf("%s ",$i);
+      printf("\n");}' >test.$$.mcep
+
+paste actual.$$.mcep test.$$.mcep |
 awk '{t=0;
       if (channels == 0)
          channels = NF;
@@ -136,7 +153,7 @@ awk '{t=0;
         printf "MCDmean %3.3f std %3.3f var %3.3f rms %3.3f n %d\n",mean(sumall,countall),std(sumall,sumsqall,countall),std(sumall,sumsqall,countall)*std(sumall,sumsqall,countall),sqrt(sumsqall/countall),countall
      }'
 
-rm -f mcep.diff actual.mcep test.mcep
+rm -f mcep.$$.diff actual.$$.mcep test.$$.mcep
 
 exit 0
 

@@ -48,6 +48,7 @@
 (load "festvox/INST_LANG_VOX_clunits.scm")
 
 (defvar cluster_feature_filename "all.desc")
+(defvar split_long_silences t)  ;; good for unit selection
 
 ;;; Add Build time parameters
 (set! INST_LANG_VOX::dt_params
@@ -107,6 +108,9 @@ Build cluster synthesizer for the given recorded data and domain."
 Get setup ready for (do_all) (or (do_init))."
   (eval (list INST_LANG_VOX::closest_voice))
   (INST_LANG_VOX::select_phoneset)
+  (INST_LANG_VOX::select_tokenizer)
+  (INST_LANG_VOX::select_tagger)
+  (INST_LANG_VOX::select_lexicon)
 
   ;; Add specific fileids to the list for this run
   (set! INST_LANG_VOX::dt_params
@@ -131,7 +135,7 @@ Synthesize given text and save waveform and labels for prompts."
         (utt.save.wave utt1 (format nil "prompt-wav/%s.wav" name)))
     t))
 
-(define (build_prompts file)
+(define (build_prompts_waves file)
   "(build_prompt file) 
 For each utterances in prompt file, synth and save waveform and
 labels for prompts and aligning."
@@ -140,7 +144,7 @@ labels for prompts and aligning."
  (let ((p (load file t)))
     (mapcar
      (lambda (l)
-       (format t "%s PROMPTS\n" (car l))
+       (format t "%s PROMPTS with waves\n" (car l))
        (unwind-protect
         (do_prompt (car l) (cadr l))
         nil)
@@ -157,7 +161,7 @@ labels for prompts and aligning."
   (fclose sfd)
 )
 
-(define (build_prompts_no_wave file)
+(define (build_prompts file)
   "(build_prompt file) 
 For each utterances in prompt file, synth and save waveform and
 labels for prompts and aligning."
@@ -186,21 +190,27 @@ to predicted labels building a new utetrances and saving it."
      (lambda (l)
        (format t "%s UTTS\n" (car l))
        (unwind-protect
-        (align_utt (car l) (cadr l))
+	(let ((featlist (caddr l)))
+	  (if (and (consp featlist)
+		  (consp (car featlist)))
+	      (align_utt (car l) (cadr l) featlist)
+	      (align_utt (car l) (cadr l) nil)))
         nil)
        t)
      p)
     t))
 
-(define (align_utt name text)
+(define (align_utt name text featlist)
   "(align_utts file) 
 Synth an utterance and load in the actualed aligned segments and merge
-them into the synthesizer utterance."
+them into the synthesizer utterance. featlist is a list of tuples of
+features (name-value pairs) to set in the utterance"
   (let ((utt1 (utt.load nil (format nil "prompt-utt/%s.utt" name)))
 	;(utt1 (utt.synth (eval (list 'Utterance 'Text text))))
 	(silence (car (cadr (car (PhoneSet.description '(silences))))))
 	segments actual-segments)
-	
+
+    (set! my_silence silence)
     (utt.relation.load utt1 'actual-segment 
 		       (format nil "lab/%s.lab" name))
     (set! segments (utt.relation.items utt1 'Segment))
@@ -280,15 +290,71 @@ them into the synthesizer utterance."
 				      (+ 0.150 
 					(item.feat a "p.end")))))
                              'before)))))
-     (utt.relation.items utt1 'Segment))
+     (if split_long_silences
+         (utt.relation.items utt1 'Segment)
+         nil))
 
     (utt.relation.delete utt1 'actual-segment)
     (utt.set_feat utt1 "fileid" name)
+
+    (mapcar
+     (lambda (feattuple)
+       ;(format t "Setting Feat: %s %s\n" (car feattuple) (cadr feattuple))
+       (utt.set_feat utt1 (car feattuple) (cadr feattuple)))
+     featlist)
+
     ;; If we have an F0 add in targets too
-    (if (probe_file (format nil "f0/%s.f0" name))
-	(build::add_targets utt1))
+    ;; This breaks builds more than it helps them
+;    (if (probe_file (format nil "f0/%s.f0" name))
+;	(build::add_targets utt1))
+    (rephrase utt1)
     (utt.save utt1 (format nil "festival/utts/%s.utt" name))
     t))
+
+(defvar my_silence "pau")
+(define (pau_duration s)
+  (cond 
+   ((null s) 0.0)
+   ((string-equal my_silence (item.name s))
+    (+ (item.feat s "segment_duration")
+       (pau_duration (item.next s))))
+   (t
+    0.0)))
+
+(define (rephrase utt)
+  "(rephrase utt)
+remove phrasing and recreate it based on the silences in the segment stream."
+  (let ((silence (car (cadr (car (PhoneSet.description '(silences)))))))
+
+    (utt.relation.delete utt 'Phrase)
+    (utt.relation.create utt 'Phrase)
+    (set! topphrase nil)
+
+    (mapcar
+     (lambda (w)
+       (if (null topphrase)
+           (begin
+             (set! topphrase (utt.relation.append utt 'Phrase nil))
+             (item.set_feat topphrase "name" "B")))
+       (item.relation.append_daughter topphrase 'Phrase w)
+       (if (and (item.next w)
+                (string-equal 
+                 silence 
+                 (item.feat 
+                  w "R:SylStructure.daughtern.daughtern.R:Segment.n.name"))
+                (> (item.feat
+                    w
+                    "R:SylStructure.daughtern.daughtern.R:Segment.n.lisp_pau_duration")
+                    0.080))
+           (set! topphrase nil))
+       )
+     (utt.relation.items utt 'Word))
+
+    ;; Not sure if last phrase should get a BB or not
+    (if topphrase
+        (item.set_feat topphrase "name" "BB"))
+  )
+)
 
 (define (rebuild_utts file)
   "(rebuild_utts file) 
@@ -333,7 +399,7 @@ them into the synthesizer utterance."
 
     ;; These should align, but if the labels had to be hand edited
     ;; then they may not, we cater here for insertions and deletions
-    ;; of silences int he corrected hand labelled files (actual-segments)
+    ;; of silences in the corrected hand labelled files (actual-segments)
     ;; If you need to something more elaborate you'll have to change the
     ;; code below.
     (while (and segments actual-segments)
@@ -897,6 +963,119 @@ it as a simple assoc list."
     (set! dur_stats (collect_dur_stats utts))
     (score_utts utts dur_stats ofile)
     t))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;;  Display selected units linked back to the units they came from
+;;;
+;;;
+
+(define (clunits::display_selected utt)
+
+  (clunits::display utt)
+  (system (format nil "rm -rf scratch/cl\n"))
+  (system (format nil "mkdir scratch/cl\n"))
+  (system (format nil "(cd scratch/cl && mkdir wav lab emu emulab_hlb)"))
+  (set! unum 0)
+  (mapcar
+   (lambda (unit)
+     (set! unit_utt_name 
+           (format nil "%03d_%s_%1.3f_%s"
+                   unum
+                   (item.name unit)
+                   (item.feat unit "end")
+                   (item.feat unit "fileid")))
+     (set! unum (+ 1 unum))
+
+     (system
+      (format nil "ln lab/%s.lab scratch/cl/lab/%s.lab\n"
+              (item.feat unit "fileid") unit_utt_name))
+     (system
+      (format nil "ln wav/%s.wav scratch/cl/wav/%s.wav\n"
+              (item.feat unit "fileid") unit_utt_name))
+     )
+   (utt.relation.items utt 'Unit))
+
+  (system (format nil "(cd scratch/cl && emulabel ../../etc/emu_lab &)\n"))
+  t
+  )
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;;  Unit Selection tts 
+;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define (tts_test ttd odir)
+
+  (mapcar
+   (lambda (x)
+     (format t "%s tts" (car x))
+     (unwind-protect
+      (begin
+        (set! utt1 (SynthText (cadr x)))
+        (utt.save.wave utt1 (format nil "%s/%s.wav" odir (car x))))
+      (begin
+        (format t " failed")))
+     (format t "\n"))
+   (load ttd t))
+  t)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;
+;;;  Unit Selection measures
+;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define (usm id text)
+  (set! utts (SynthText text))
+  (set! utta (utt.load nil (format nil "festival/utts/%s.utt" id )))
+;  (set! utta (Wave_Synth utta))
+;  (mapcar
+;   (lambda (x y)
+;     (if (not (string-equal (item.name x) (item.name y)))
+;         (format t "%s %s %s %f\n" id (item.name x) (item.name y)
+;                 (item.feat y "end"))))
+;   (utt.relation.items utts 'Segment)
+;   (utt.relation.items utta 'Segment))
+
+  (apply
+   +
+   (mapcar
+    (lambda (u)
+      (if (and (string-equal id (item.feat u "fileid"))
+               (or (null (item.prev u))
+                   (and (string-equal id (item.feat u "p.fileid"))
+                        (equal? (item.feat u "unit_start")
+                                (item.feat u "p.unit_end")))))
+          1
+          0
+      ))
+    (utt.relation.items utts 'Unit)))
+)
+
+(define (usm_file ttd odir)
+  (let ((usm_count 0) (usm_total 0))
+
+  (mapcar
+   (lambda (x)
+     (set! c (usm (car x) (cadr x)))
+     (set! us (length (utt.relation.items utts 'Unit)))
+     (format t "USM %s %2.2f %2.2f %2.2f\n" (car x) c 
+             us
+             (* 100.0 (/ c us)))
+     (utt.save.wave utts (format nil "%s/%s.wav" odir (car x)))
+     (set! usm_count (+ c usm_count))
+     (set! usm_total (+ us usm_total))
+     )
+   (load ttd t))
+
+  (format t "USM_TOTAL %2.2f %2.2f %2.2f\n"
+          usm_count
+          usm_total
+          (* 100.0 (/ usm_count usm_total)))
+  )
+)
 
 (provide 'build_clunits)
 

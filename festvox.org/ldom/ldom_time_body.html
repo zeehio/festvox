@@ -1,0 +1,114 @@
+<!-- start of page body -->
+<td width="80%" valign="TOP">
+  <table width="100%" border="0" cellspacing="2" cellpadding="5">
+    <tr><td>
+    <TABLE BORDER=0 WIDTH=100% CELLPADDING=0 CELLSPACING=0> <TR> <TD BGCOLOR=#000000 HEIGHT=1><TABLE BORDER=0 WIDTH=100% CELLPADDING=0 CELLSPACING=0><TR><TD></TD></TR></TABLE></TD> </TR> </TABLE>
+    <TABLE BORDER=0 WIDTH=100% CELLPADDING=2 CELLSPACING=0>
+      <TR><td bgcolor="#EEEED4">
+      <b>Speaking Clock Example</b>
+      </TD></tr>
+    </TABLE>
+    <TABLE BORDER=0 WIDTH=100% CELLPADDING=0 CELLSPACING=0> <TR> <TD BGCOLOR=#000000 HEIGHT=1><TABLE BORDER=0 WIDTH=100% CELLPADDING=0 CELLSPACING=0><TR><TD></TD></TR></TABLE></TD> </TR> </TABLE>
+    <table width="100%" border="0" cellpadding="10"><tr><td>
+    This following is merely a tutorial tool within Festival about
+    recording a (very) limited domain synthesizer.  Twenty-four utterances
+    were recorded (on a home PC, hence the background noise) and a
+    speaking clock was then automatically built from the recorded forms,
+    using our standard software tools.  Although the results are not
+    perfect, the ease of building such a synthesizer is quite attractive.
+    <P>
+    The recordings of the follow utterances were made 
+    <pre>
+  "The time is now, exactly five past one, in the morning."
+  "The time is now, just after ten past two, in the morning."
+  "The time is now, a little after quarter past three, in the morning."
+  "The time is now, almost twenty past four, in the morning."
+  "The time is now, exactly twenty-five past five, in the morning."
+  "The time is now, just after half past six, in the morning."
+  "The time is now, a little after twenty-five to seven, in the morning."
+  "The time is now, almost twenty to eight, in the morning."
+  "The time is now, exactly quarter to nine, in the morning."
+  "The time is now, just after ten to ten, in the morning."
+  "The time is now, a little after five to eleven, in the morning."
+  "The time is now, almost twelve."
+  "The time is now, just after five to one, in the afternoon."
+  "The time is now, a little after ten to two, in the afternoon."
+  "The time is now, exactly quarter to three, in the afternoon."
+  "The time is now, almost twenty to four, in the afternoon."
+  "The time is now, just after twenty-five to five, in the afternoon."
+  "The time is now, a little after half past six, in the evening."
+  "The time is now, exactly twenty-five past seven, in the evening."
+  "The time is now, almost twenty past eight, in the evening."
+  "The time is now, just after quarter past nine, in the evening."
+  "The time is now, almost ten past ten, in the evening."
+  "The time is now, exactly five past eleven, in the evening."
+  "The time is now, a little after quarter to midnight."
+    </pre>
+    These were autoaligned and a cluster unit selection voice built
+    from them (a fully automatic process).  The resulting synthesizer 
+    can then speak any time (in the format of the database).
+    <P>
+    Full instructions and scripts to build such a limited domain synthesizer
+    such as a speaking clock will be released with the next version of
+    the <A HREF="../festvox/festvox_toc.html"><em>Building Voices in 
+    Festival</em></a> document.  The database this voice was created
+    from is available <A HREF="../examples/cmu_time_awb_ldom/">here</A>
+    </td></tr></table>
+    <TABLE BORDER=0 WIDTH=100% CELLPADDING=0 CELLSPACING=0> <TR> <TD BGCOLOR=#000000 HEIGHT=1><TABLE BORDER=0 WIDTH=100% CELLPADDING=0 CELLSPACING=0><TR><TD></TD></TR></TABLE></TD> </TR> </TABLE>
+    <TABLE BORDER=0 WIDTH=100% CELLPADDING=2 CELLSPACING=0>
+      <TR><td bgcolor="#EEEED4">
+      <b>What time is it?</b>
+      </TD></tr>
+    </TABLE>
+    <TABLE BORDER=0 WIDTH=100% CELLPADDING=0 CELLSPACING=0> <TR> <TD BGCOLOR=#000000 HEIGHT=1><TABLE BORDER=0 WIDTH=100% CELLPADDING=0 CELLSPACING=0><TR><TD></TD></TR></TABLE></TD> </TR> </TABLE>
+    <table width="100%" border="0" cellpadding="10"><tr><td>
+    <p>
+    This speaking clock was fully automatically generated from the
+    recordings of the utterances listed above.
+    <p>
+    Some pre-synthesized examples: <br>
+    <A HREF="__TOP__sounds/time-10_35am.wav">
+    <IMG SRC="__TOP__images/sound.png" alt="sound"></A> 10:35 am<br>
+    <A HREF="__TOP__sounds/time-7_54pm.wav">
+    <IMG SRC="__TOP__images/sound.png" alt="sound"></A> 7:54 pm<br>
+    <A HREF="__TOP__sounds/time-4_47pm.wav">
+    <IMG SRC="__TOP__images/sound.png" alt="sound" ></A> 4:47 pm<br>
+    <p>
+    And a real-time synthesized example (in different styles):<br>
+    <FORM METHOD = POST ACTION = "http://www.festvox.org/cgi-bin/gen_time2_ldom.wav">
+    <DL>
+    <SELECT SIZE=1 NAME="voice">
+    <option selected>normal
+    <option>trent
+    <option>hemos
+    <option>golem
+    <option>falsetto
+    <option>kalawb
+    <option>chinese
+    <option>nepali
+    <option>japanese
+    </SELECT>
+    <INPUT TYPE = submit VALUE = "What's the time?"> (in Pittsburgh, GMT-5:00)
+    </DL>
+    </FORM>
+    <p>
+    <FORM METHOD = POST ACTION = "http://www.festvox.org/cgi-bin/gen_time2_ldom_npt.wav">
+    <DL>
+    <SELECT SIZE=1 NAME="voice">
+    <option selected>nepali
+    <option>normal
+    <option>trent
+    <option>hemos
+    <option>golem
+    <option>falsetto
+    <option>kalawb
+    <option>chinese
+    <option>japanese
+    </SELECT>
+    <INPUT TYPE = submit VALUE = "What's the time?"> (in Katmandu, GMT+5:45)
+    </DL>
+    </FORM>
+    </td></tr></table>
+    </td></tr>
+  </table>
+</td>

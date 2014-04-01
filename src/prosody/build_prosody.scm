@@ -65,6 +65,26 @@
     ssyl_in
     ssyl_out
     sub_phrases
+R:segstate.parent.R:SylStructure.parent.syl_onsetsize
+R:segstate.parent.R:SylStructure.parent.syl_codasize
+R:segstate.parent.R:SylStructure.parent.R:Syllable.n.syl_onsetsize
+R:segstate.parent.R:SylStructure.parent.R:Syllable.p.syl_codasize
+R:segstate.parent.R:SylStructure.parent.parent.word_numsyls
+R:segstate.parent.R:SylStructure.parent.pos_in_word
+R:segstate.parent.R:SylStructure.parent.syl_in
+R:segstate.parent.R:SylStructure.parent.syl_out
+R:segstate.parent.R:SylStructure.parent.ssyl_in
+R:segstate.parent.R:SylStructure.parent.ssyl_out
+R:segstate.parent.R:SylStructure.parent.asyl_in
+R:segstate.parent.R:SylStructure.parent.asyl_out
+R:segstate.parent.R:SylStructure.parent.last_accent
+R:segstate.parent.R:SylStructure.parent.next_accent
+R:segstate.parent.R:SylStructure.parent.sub_phrases
+R:segstate.parent.R:SylStructure.parent.R:Syllable.pp.lisp_cg_break
+R:segstate.parent.R:SylStructure.parent.R:Syllable.p.lisp_cg_break
+R:segstate.parent.R:SylStructure.parent.lisp_cg_break
+R:segstate.parent.R:SylStructure.parent.R:Syllable.n.lisp_cg_break
+R:segstate.parent.R:SylStructure.parent.R:Syllable.nn.lisp_cg_break
     ))
 (defvar feat_int_types
   '())
@@ -99,6 +119,33 @@ floats as appropriate."
        (format ofd "%l\n" fd)
        t)
      desc)
+    (format ofd ")\n")
+    (fclose ofd)))
+
+(define (build_dur_vec_feats_desc)
+  "(build_dur_feats_desc)
+Replaces the huge list of numbers in the dur.desc file with
+floats as appropriate."
+  (build_fix_desc_vec_file "festival/dur/etc/dur.desc"))
+
+(define (build_fix_desc_vec_file descfile)
+  (let ((desc (car (load descfile t)))
+	(ofd (fopen descfile "w")))
+    (format ofd "(\n")
+    (format ofd "(durvec vector)\n")
+    (mapcar
+     (lambda (fd)
+       (if (not (cddr fd))
+	   (set-cdr! fd (cons 'ignore)))
+       (cond
+	((member_string (car fd) feat_float_types)
+	 (set-cdr! fd (cons 'float)))
+	((member_string (car fd) feat_int_types)
+	 (set-cdr! fd (cons 'float)))
+	)
+       (format ofd "%l\n" fd)
+       t)
+     (cdr desc))
     (format ofd ")\n")
     (fclose ofd)))
 

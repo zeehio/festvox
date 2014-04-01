@@ -1,0 +1,128 @@
+<!-- start of page body -->
+<td width="80%" valign="TOP">
+  <table width="100%" border="0" cellspacing="2" cellpadding="5">
+    <tr><td>
+    <TABLE BORDER=0 WIDTH=100% CELLPADDING=0 CELLSPACING=0> <TR> <TD BGCOLOR=#000000 HEIGHT=1><TABLE BORDER=0 WIDTH=100% CELLPADDING=0 CELLSPACING=0><TR><TD></TD></TR></TABLE></TD> </TR> </TABLE>
+    <TABLE BORDER=0 WIDTH=100% CELLPADDING=2 CELLSPACING=0>
+      <TR><td bgcolor="#EEEED4">
+      <b>Current US Weather</b>
+      </TD></tr>
+    </TABLE>
+    <TABLE BORDER=0 WIDTH=100% CELLPADDING=0 CELLSPACING=0> <TR> <TD BGCOLOR=#000000 HEIGHT=1><TABLE BORDER=0 WIDTH=100% CELLPADDING=0 CELLSPACING=0><TR><TD></TD></TR></TABLE></TD> </TR> </TABLE>
+    <P>
+    A second more complex example of limited domain synthesis involves
+    presenting the current weather throughout the US.  Here we use a simple
+    script to get the current weather from <A HREF="http://weather.gov">
+    http://weather.gov</A> for a named city and state.  The script extracts
+    the basic information for outlook, temperature and wind speed and 
+    direction.  The distribution of these was analysed and a database of 
+    <A HREF="__TOP__examples/cmu_weather_awb_ldom/etc/weather.data">one
+    hundred utterances</A> was generated to cover all dates, temperatures
+    etc.  A limited domain synthesizer as described in 
+    <A HREF="__TOP__festvox/festvox_7.html">chapter 7</A> was created.  These
+    are actually used using a slightly newer version of the 
+    <A HREF="__TOP__examples/cmu_weather_awb_ldom/src/festopt_clunits.tar.gz">
+    clunits Festival module</A> than in the Festival 1.4.1 release, and
+    requires that update to run reasonably (both in quality and speed).
+    <P>
+    The weather reports are updated approximately every hour.  The synthesized
+    outputs are taken from the cache if a recently example exists to save
+    time in synthesis and to deal with occasional slow access to weather.gov.
+    It takes significantly longer to send the waveform file over the web than
+    it does to synthesize it.
+    <P>
+    <strong>NOTE:</strong> This is designed to demo our synthesis technique 
+    rather than provide
+    useful weather updates.  This allows us to demo synthesis of dynamically
+    changing but constrained data, though our script that gets the weather
+    sometimes fails to parse the text data from weather.gov and hence an
+    apology message is generated.
+    <P>
+    Some standard cities
+    <UL>
+    <LI>
+    <A HREF="http://www.festvox.org/cgi-bin/gen_weather.wav?city=pittsburgh&state=pa">
+    <IMG SRC="__TOP__images/sound.png" alt="sound"></A>Pittsburgh, PA</LI>
+    <LI>
+    <A HREF="http://www.festvox.org/cgi-bin/gen_weather.wav?city=new+york+city&state=ny">
+    <IMG SRC="__TOP__images/sound.png" alt="sound"></A>New York City, NY</LI>
+    <LI>
+    <A HREF="http://www.festvox.org/cgi-bin/gen_weather.wav?city=boston&state=ma">
+    <IMG SRC="__TOP__images/sound.png" alt="sound"></A>Boston, MA</LI>
+    <LI>
+    <A HREF="http://www.festvox.org/cgi-bin/gen_weather.wav?city=portland&state=or">
+    <IMG SRC="__TOP__images/sound.png" alt="sound"></A>Portland, OR</LI>
+    <LI>
+    <A HREF="http://www.festvox.org/cgi-bin/gen_weather.wav?city=miami&state=fl">
+    <IMG SRC="__TOP__images/sound.png" alt="sound"></A>Miami, FL</LI>
+    </UL>    
+    <P>
+    Or enter city name and select state.
+    <P>
+      <FORM name="weather" method="get" action="http://www.festvox.org/cgi-bin/gen_weather.wav">
+      City: <input NAME="city" size="15"></input>
+      State: <SELECT SIZE=1 NAME="state">
+      <option>AL</option>
+      <option>AK</option>
+      <option>AR</option>
+      <option>AZ</option>
+      <option>CA</option>
+      <option>CO</option>
+      <option>CT</option>
+      <option>DE</option>
+      <option>FL</option>
+      <option>GA</option>
+      <option>HI</option>
+      <option>IA</option>
+      <option>ID</option>
+      <option>IL</option>
+      <option>IN</option>
+      <option>KS</option>
+      <option>KY</option>
+      <option>LA</option>
+      <option>MA</option>
+      <option>MD</option>
+      <option>ME</option>
+      <option>MI</option>
+      <option>MN</option>
+      <option>MS</option>
+      <option>MT</option>
+      <option>MO</option>
+      <option selected>PA</option>
+      <option>NC</option>
+      <option>ND</option>
+      <option>NE</option>
+      <option>NH</option>
+      <option>NJ</option>
+      <option>NM</option>
+      <option>NV</option>
+      <option>NY</option>
+      <option>OH</option>
+      <option>OK</option>
+      <option>OR</option>
+      <option>PR</option>
+      <option>RI</option>
+      <option>SC</option>
+      <option>SD</option>
+      <option>TN</option>
+      <option>TX</option>
+      <option>UT</option>
+      <option>VA</option>
+      <option>VT</option>
+      <option>WA</option>
+      <option>WI</option>
+      <option>WV</option>
+      <option>WY</option></SELECT>
+      <INPUT TYPE = submit VALUE="Get Weather">
+      </FORM> 
+    <P>
+    The city name is as defined by the National Weather Service and
+    may be arbitrarily (but consistently) abbreviated.   Not all cities
+    are available, to find out the appropriate name to enter check the
+    hourly reports for that state at 
+    <A HREF="http://iwin.nws.noaa.gov/iwin/iwdspg1.html">
+    http://iwin.nws.noaa.gov/iwin/iwdspg1.html</A>.
+    </td></tr></table>
+    </td></tr>
+  </table>
+</td>

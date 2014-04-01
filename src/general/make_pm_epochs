@@ -63,8 +63,17 @@ fi
 EPOCHS=$ESPS_BASE/bin/epochs
 PLAIN=$ESPS_BASE/bin/pplain
 EFREE=$ESPS_BASE/bin/efree
+# Free version doesn't require efree anymore
+EFREE=/bin/true
 
-for i in $*
+PROMPTFILE=etc/txt.done.data
+if [ $# = 1 ]
+then
+   PROMPTFILE=$1
+fi
+
+awk '{print $2}' $PROMPTFILE |
+while read i
 do
    fname=`basename $i .wav`
    echo $i

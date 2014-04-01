@@ -1,0 +1,151 @@
+<!-- start of page body -->
+<td width="80%" valign="TOP">
+  <table width="100%" border="0" cellspacing="2" cellpadding="5">
+    <tr><td>
+    <TABLE BORDER=0 WIDTH=100% CELLPADDING=0 CELLSPACING=0> <TR> <TD BGCOLOR=#000000 HEIGHT=1><TABLE BORDER=0 WIDTH=100% CELLPADDING=0 CELLSPACING=0><TR><TD></TD></TR></TABLE></TD> </TR> </TABLE>
+    <TABLE BORDER=0 WIDTH=100% CELLPADDING=2 CELLSPACING=0>
+      <TR><td bgcolor="#EEEED4">
+      <b>CMU Dialog systems</b>
+      </TD></tr>
+    </TABLE>
+    <TABLE BORDER=0 WIDTH=100% CELLPADDING=0 CELLSPACING=0> <TR> <TD BGCOLOR=#000000 HEIGHT=1><TABLE BORDER=0 WIDTH=100% CELLPADDING=0 CELLSPACING=0><TR><TD></TD></TR></TABLE></TD> </TR> </TABLE>
+    <P>
+The following is an example dialog from the <A
+HREF="http://www.speech.cs.cmu.edu/Communicator">CMU Darpa
+Communicator</A>.  Communcator is a automated telephone based dialog
+systems for booking flight information.  The following dialog is
+an actual dialog, but the agent side has been replaced with synthesizer
+output using the <A HREF="http://festvox.org/ldom/">Limited Domain Synthesis
+techniques</A> as described in the <A HREF="http://festvox.org">FestVox
+project</A>
+<p>
+When the limited domain synthesizer fails, it defaults to using the
+diphone synthsizer (which is built from the same speaker), though
+doesn't happen in this example.  Note although selections in the
+limited doamin synthesizer do use then word name as an index this is
+different from simple word and phrase concatenation as the join will
+often ocurr within word, as that's is determined to be the best join
+point.  If you listen carefully there are occasionally errors in the
+synthesis, the word "air" in the final email address is very short,
+and some joins are not very smooth.  However the quality of synthesis
+is far superior than standard text to speech.
+<p>
+The voices was constructed from 630 in-domain utterances selected by
+looking at the most frequent utterances made by the communciator over
+a 3 month period, plus others to ensure word coverage of the domain.
+<p>
+The complete dialog as <A HREF="samples/com_all.wav">one waveform</A>
+(in 8KHz riff wavefile) or as an <A HREF="samples/com_all.mp3">mp3 file</A>
+<p>
+<TABLE BORDER WIDTH="100%" style="width:7.0in;
+ border-collapse:collapse;mso-padding-alt:.1in .1in .1in .1in" >
+<TR NOSAVE>
+<TD VALIGN=TOP NOSAVE style="width:0.5in;padding:.1in .1in .1in .1in"><B><FONT COLOR="#000000">000</FONT></B></TD>
+
+<TD VALIGN=TOP WIDTH="600" style="width:6.0in;padding:.1in .1in .1in .1in"><B><A HREF="samples/000_A_001.wav">S</A>:
+ Hello. Welcome to the Carnegie Mellon Communicator.   Are you a registered user?&nbsp;</B>&nbsp;
+<BR><A HREF="samples/001_U_001.wav">U</A>: "HI THIS IS ALEX RUDNICKY I'D LIKE TO FLY TO CHARLESTON PLEASE"&nbsp;</TD>
+</TR>
+
+<TR>
+<TD VALIGN=TOP WIDTH="100" style="width:0.5in;padding:.1in .1in .1in .1in"><B>001</B></TD>
+
+<TD VALIGN=TOP WIDTH="600" style="width:6.0in;padding:.1in .1in .1in .1in"><B><A HREF="samples/002_A_002.wav">S</A>:
+Hello, dr Rudnicky, i'm glad to hear from you again. You can ask me for help at any time.  You can fly to charleston in south carolina or charleston in west virginia.&nbsp;</B>&nbsp;
+<BR><A HREF="samples/003_U_002.wav">U</A>: "SOUTH CAROLINA"&nbsp;</TD>
+</TR>
+
+<TR>
+<TD VALIGN=TOP WIDTH="100" style="width:0.5in;padding:.1in .1in .1in .1in"><B>002</B>&nbsp;</TD>
+
+<TD VALIGN=TOP WIDTH="600" style="width:6.0in;padding:.1in .1in .1in .1in"><B><A HREF="samples/004_A_003.wav">S</A>:
+ a flight to charleston.  departing pittsburgh on what day &nbsp;</B>&nbsp;
+<BR><A HREF="samples/005_U_003.wav">U</A>: "ON THE FIFTEENTH "&nbsp;</TD>
+</TR>
+
+<TR>
+<TD VALIGN=TOP WIDTH="100" style="width:0.5in;padding:.1in .1in .1in .1in"><B>003</B></TD>
+
+<TD VALIGN=TOP WIDTH="600" style="width:6.0in;padding:.1in .1in .1in .1in"><B><A HREF="samples/006_A_004.wav">S(1)</A>:
+I'm sorry. I must have misheard the date..  a flight on Tuesday, February fifteenth.  okay what day would you be traveling? &nbsp;</B>&nbsp;
+<BR><A HREF="samples/007_U_004.wav">U</A>: "ON MARCH FIFTEENTH"&nbsp;</TD>
+</TR>
+
+<TR>
+<TD VALIGN=TOP WIDTH="100" style="width:0.5in;padding:.1in .1in .1in .1in"><B>004</B></TD>
+
+<TD VALIGN=TOP WIDTH="600" style="width:6.0in;padding:.1in .1in .1in .1in"><B><A HREF="samples/008_A_005.wav">S(1)</A>:
+traveling on Wednesday, March fifteenth.&nbsp;</B>&nbsp;
+<BR><B><A HREF="samples/009_A_005.wav">S(2)</A>: One Moment Please... ... Let's see ... ... ... ... flights from pittsburgh to charleston ... ... ... ... ... if you'll just hold on, this shouldn't take too long ... ... ... ... ... Gosh, the network has been slow all day ... ... ... I'm glad you called, though ... ... ... ... I'm not sure how long this will take ... ... ... This has been a long day, but I'm glad you called ... ... hummmmm... this is taking longer than usual ... ... .... ... i wonder if something is wrong ... ... ... ... ... i'll bet the network is down again!&nbsp;</B>&nbsp;
+<BR><B><A HREF="samples/010_A_005.wav">S(3)</A>: i have a nonstop on US Airways departing Pittsburgh at eleven thirty five a.m. , arrives Charleston at one thirty five p.m. .&nbsp;</B>&nbsp;
+<BR><A HREF="samples/011_U_005.wav">U</A>: "HOW 'BOUT SOMETHING LATER"&nbsp;</TD>
+</TR>
+
+<TR NOSAVE>
+<TD VALIGN=TOP WIDTH="100" style="width:0.5in;padding:.1in .1in .1in .1in"><B>005</B></TD>
+
+<TD VALIGN=TOP WIDTH="600" NOSAVE style="width:6.0in;padding:.1in .1in .1in .1in"><B><A HREF="samples/012_A_006.wav">S</A>:
+the flight after that departs Pittsburgh at two ten p.m. arriving in Charleston at four ten p.m.   Is that OK?&nbsp;</B>&nbsp;
+<BR><A HREF="samples/013_U_006.wav">U</A>: "OKAY THAT'S FINE"&nbsp;</TD>
+</TR>
+
+<TR>
+<TD VALIGN=TOP WIDTH="100" style="width:0.5in;padding:.1in .1in .1in .1in"><B>006</B></TD>
+
+<TD VALIGN=TOP WIDTH="600" style="width:6.0in;padding:.1in .1in .1in .1in"><B><A HREF="samples/014_A_007.wav">S</A>:
+Will you return to pittsburgh from charleston?&nbsp;</B>&nbsp;
+<BR><A HREF="samples/015_U_007.wav">U</A>: "YES ON SATURDAY "&nbsp;</TD>
+</TR>
+
+<TR NOSAVE>
+<TD VALIGN=TOP WIDTH="100" style="width:0.5in;padding:.1in .1in .1in .1in"><B>007</B></TD>
+
+<TD VALIGN=TOP WIDTH="600" NOSAVE style="width:6.0in;padding:.1in .1in .1in .1in"><B><A HREF="samples/016_A_008.wav">S(1)</A>:
+traveling on Saturday, March eighteenth.&nbsp;</B>&nbsp;
+<BR><B><A HREF="samples/017_A_008.wav">S(2)</A>: okay i have a nonstop on US Airways departing Charleston at eleven oh five a.m. arrive Pittsburgh at one thirteen p.m.   Do you want to take that?&nbsp;</B>&nbsp;
+<BR><A HREF="samples/018_U_008.wav">U</A>: "THAT'S PERFECT I'LL TAKE IT "&nbsp;</TD>
+</TR>
+
+<TR>
+<TD VALIGN=TOP WIDTH="100" style="width:0.5in;padding:.1in .1in .1in .1in"><B>008</B></TD>
+
+<TD VALIGN=TOP WIDTH="600" style="width:6.0in;padding:.1in .1in .1in .1in"><B><A HREF="samples/019_A_009.wav">S</A>:
+Do you need any hotel or car reservations?&nbsp;</B>&nbsp;
+<BR><A HREF="samples/020_U_009.wav">U</A>: "YES I'LL NEED A CAR "&nbsp;</TD>
+</TR>
+
+<TR>
+<TD VALIGN=TOP WIDTH="100" style="width:0.5in;padding:.1in .1in .1in .1in"><B>009</B></TD>
+
+<TD VALIGN=TOP WIDTH="600" style="width:6.0in;padding:.1in .1in .1in .1in"><B><A HREF="samples/021_A_010.wav">S</A>:
+no hotels.  Do you need a car in charleston?&nbsp;</B>&nbsp;
+<BR><A HREF="samples/022_U_010.wav">U</A>: "YES PLEASE"&nbsp;</TD>
+</TR>
+
+<TR>
+<TD VALIGN=TOP WIDTH="100" style="width:0.5in;padding:.1in .1in .1in .1in"><B>009</B></TD>
+
+<TD VALIGN=TOP WIDTH="600" style="width:6.0in;padding:.1in .1in .1in .1in"><B><A HREF="samples/023_A_011.wav">S</A>:
+I've made a request for a car with Avis in charleston.  Do you want a summary of your trip?&nbsp;</B>&nbsp;
+<BR><A HREF="samples/024_U_011.wav">U</A>: "YES PLEASE"&nbsp;</TD>
+</TR>
+
+<TR>
+<TD VALIGN=TOP WIDTH="100" style="width:0.5in;padding:.1in .1in .1in .1in"><B>010</B></TD>
+
+<TD VALIGN=TOP WIDTH="600" style="width:6.0in;padding:.1in .1in .1in .1in"><B><A HREF="samples/025_A_012.wav">S</A>:
+Your first flight, is a US Airways flight 4072 leaving pittsburgh at two ten P.M. on Wednesday, March fifteenth, arriving in charleston at four ten P.M.. Then, the next flight is a US Airways flight 4120 leaving charleston at eleven oh five A.M. on Saturday, March eighteenth, arriving in pittsburgh at one thirteen P.M. .   I've made no hotel reservations for your trip. I've requested a rental car in charleston.   Are you satisfied with this itinerary?&nbsp;</B>&nbsp;
+<BR><A HREF="samples/026_U_012.wav">U</A>: "YES "&nbsp;</TD>
+</TR>
+
+<TR>
+<TD VALIGN=TOP WIDTH="100" style="width:0.5in;padding:.1in .1in .1in .1in"><B>011</B></TD>
+
+<TD VALIGN=TOP WIDTH="600" style="width:6.0in;padding:.1in .1in .1in .1in"><B><A HREF="samples/027_A_013.wav">S</A>:
+Mail sent to air@CS.CMU.EDU.  Thank you for using the Carnegie Mellon Communicator. Please tell me any comments. When you're finished, just hang up.&nbsp;</B></TD>
+</TR>
+</TABLE>
+    </td></tr></table>
+    </td></tr>
+  </table>
+</td>

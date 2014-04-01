@@ -1,0 +1,733 @@
+#!/usr/bin/perl
+#-------------------------------------------
+# MiniSearch v0.2
+# Personal Website Search Engine
+# http://www.dansteinman.com/minisearch/
+#
+# Copyright (C) 1999 Dan Steinman
+# Distributed under the terms of the of the GNU General Public License
+# You may modify this progam, redistribute it in it's entirety,
+# but any significant improvements must be made public
+# Read the LICENSE file for more details
+#-------------------------------------------
+# searchindex
+# the indexing script that examines all words in all the pages
+#-------------------------------------------
+
+#-------------------------------------------
+
+if (!$ENV{'HTTP_HOST'}) {
+	# run as shell script, by-pass login and immediately re-index the site
+
+	$shellonly = 1;
+	&getConfig;
+	&indexSite;
+	exit(0);
+}
+else {
+	# run as cgi-script
+	
+	print "Content-type: text/html\n\n";
+	&getConfig;
+	&ReadParse;
+
+	if ($in{'command'} eq "") {
+		&displayLogin;
+	}
+	else {
+		&checkPassword;
+		if ($in{'command'} eq "saveconfig") {
+			&saveConfig;
+		}
+		elsif ($in{'command'} eq "index") {
+			&indexSite;
+		}
+		elsif ($in{'command'} eq "adminpage") {
+			&displayAdmin;
+		}
+		elsif ($in{'command'} eq "deletefiles") {
+			&deleteFiles;
+		}
+		else {
+			print "error";
+		}
+	}
+}
+
+#-------------------------------------------
+sub saveConfig {
+	@configList = ('root','datadir','searchdirs','excludedirs','webaddress','recurse');
+	foreach $configItem (@configList) {
+		$config{$configItem} = $in{$configItem};
+	}
+	if ($in{'newpass'} ne '') {
+		$config{'passwd'} = crypt($in{'newpass'},"a4");
+	}
+	
+	foreach $key (keys(%templates)) {
+		$templates{$key} = '';
+	}
+	foreach $key (keys(%forums)) {
+		$forums{$key} = '';
+	}
+	foreach $key (sort(keys(%in))) {
+		if ($key =~ /forumdata(.*)/) {
+			$data = $in{"forumdata$1"};
+			$url = $in{"forumurl$1"};
+			$forums{$data} = $url;
+		}
+		elsif ($key =~ /templatename(.*)/) {
+			$name = $in{"templatename$1"};
+			$prompt = $in{"templateprompt$1"};
+			$results = $in{"templateresults$1"};
+			if ($name ne '' && $prompt ne '' && $results ne '') {
+				$templates{$name} = "$name:$prompt:$results";
+			}
+		}
+	}
+	&generateConfig;
+	&displayLogin;
+}
+
+#-------------------------------------------
+sub generateConfig {
+	my($temporary) = @_;
+	umask(72);
+	if (open(FILE,">searchdata/config")) {
+		foreach $key (sort(keys(%config))) {
+			print FILE "$key = $config{$key}\n";
+		}
+		foreach $key (sort(keys(%templates))) {
+			next if ($templates{$key} eq '');
+			print FILE "template = $templates{$key}\n";
+		}
+		foreach $key (sort(keys(%forums))) {
+			next if ($forums{$key} eq '');
+			print FILE "forum = $key:$forums{$key}\n";
+		}
+		close(FILE);
+		print "<p>A new configuration file has been generated.<p>";
+		
+		if ($temporary) {
+			print "<p>Your temporary password is <b><i>minisearch</i></b>";
+			print "<p>The first thing you should do in the administration section is change your password to something else.";
+		}
+		print "<p>You must now login again:";
+	}
+	else {
+	print <<"EOF";
+There was a problem generating the configuration file.
+<br>Please check that the following directory exists, and that you have write access to it:
+<p><dd>$config{'datadir'}
+<p>You may have to make this directory read-write-execute for all users:
+<p><dd>chmod 777 $config{'datadir'}
+EOF
+
+		exit(0);
+	}
+}
+
+#-------------------------------------------
+sub setDefaultConfig {
+	$config{'root'} = $ENV{'DOCUMENT_ROOT'} | $forcedroot;
+		$script = $ENV{'SCRIPT_FILENAME'};
+		@parts = split('/',$script);
+	$config{'scriptindex'} = $forcedscriptindex | $parts[@parts-1];
+		$config{'scriptsearch'} = $config{'scriptindex'};
+	$config{'scriptsearch'} =~ s/index//;
+		$script =~ s/$config{'scriptindex'}//;
+	$config{'datadir'} = $forceddatadir | $script."searchdata";
+	$config{'passwd'} = crypt("minisearch","a4");
+	$config{'recurse'} = 1;
+	$config{'searchdirs'} = '/';
+	$config{'excludedirs'} = '/cgi-bin:/private';
+	$config{'webaddress'} = 'http://www.yourdomain.com';
+	$templates{'default'} = 'default:/templates/default-prompt.txt:/templates/default-results.txt';
+}
+
+#-------------------------------------------
+# the password enter page
+sub checkPassword {	
+	if (crypt($in{'password'},"a4") eq $config{'passwd'}) {
+		return 1;
+	}
+	else {
+		print "Access denied";
+		exit(0);
+	}
+}
+
+#-------------------------------------------
+sub displayChangePassword {
+	if ($in{'newpass'} ne '') {
+		changePassword($in{'newpass'});
+	}
+	else {
+		print "no password given";
+		exit(0);
+	}
+}
+
+#-------------------------------------------
+sub displayLogin {
+	print <<"EOF";
+
+<html><title>MiniSearch Admin Login</title>
+<form action="$config{'scriptindex'}" method="post">
+<input type="hidden" name="command" value="adminpage">
+Enter the password:
+<br><input type="password" name="password" size=20>
+<br><input type="submit" value="Enter">
+</form>
+</html>
+	
+EOF
+}
+
+#-------------------------------------------
+sub deleteFiles {
+	if ($in{'deletefile'}) {
+		@files = split(/:/,$in{'deletefile'});
+		foreach $file (@files) {
+			unlink("$config{'datadir'}/$file");
+		}
+	}
+	&displayLogin;
+}
+
+#-------------------------------------------------------
+# Admin page
+#-------------------------------------------------------
+sub displayAdmin {
+	if ($config{'recurse'} eq '1') {
+		$recurse = 'checked';
+	}
+	else {
+		$norecurse = 'checked';
+	}
+	if ($config{'searchdirs'} eq '/') {
+		$indexall = "checked";
+	}
+	else {
+		$indexselected = "checked";
+	}
+	print <<"EOF";
+	
+<html><title>MiniSearch Administration</title>
+<script language="javascript">
+
+function searchDirsClick(all) {
+	var f = document.changeform
+	if (parseInt(all)) f.searchdirs.value = '/'
+	else f.searchdirs.value = ''
+}
+function addSearchDir() {
+	var f = document.changeform
+	if (f.recurse.selectedIndex==0 && f.indexall[0].checked==true) {
+		f.searchdirs.value = ''
+		f.indexall[1].checked=true
+	}
+	var dir = f.addsearchdirs.options[f.addsearchdirs.selectedIndex].value
+	if (f.searchdirs.value == '') f.searchdirs.value += dir
+	else f.searchdirs.value += ':' + dir
+}
+
+function addExcludeDir() {
+	var f = document.changeform
+	var dir = f.addexcludedirs.options[f.addexcludedirs.selectedIndex].value
+	if (f.excludedirs.value == '') f.excludedirs.value += dir
+	else f.excludedirs.value += ':' + dir
+}
+
+</script>
+<h3>MiniSearch Administration</h3>
+
+<hr><b>Current Index Information:</b>
+<p><table border=1 cellpadding=5 cellspacing=0>
+<tr><td>&nbsp;</td><td><b># Entries</b></td><td><b>Filesize</b></td></tr>
+EOF
+#--------
+
+my($fileindexsize) = '-';
+my($fileindexentries) = '-';
+if (open(FILE,"$config{'datadir'}/files")) {
+	@lines = <FILE>;
+	close(FILE);
+	my($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$adate,$mdate,$ctime,$blksize,$blocks)
+		= stat "$config{'datadir'}/files";
+	my($ksize) = &round($size/1000,2);
+	$fileindexsize = "$ksize KB";
+	$fileindexentries = @lines-1;
+}
+
+my($wordindexsize) = '-';
+my($wordindexentries) = '-';
+if (open(FILE,"$config{'datadir'}/words")) {
+	@lines = <FILE>;
+	close(FILE);
+	my($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$adate,$mdate,$ctime,$blksize,$blocks)
+		= stat "$config{'datadir'}/words";
+	my($ksize) = &round($size/1000,2);
+	$wordindexsize = "$ksize KB";
+	$wordindexentries = @lines-1;
+}
+
+print "<tr><td><b>Files List</b></td><td align=center>$fileindexentries</td><td align=center>$fileindexsize</td></tr>";
+print "<tr><td><b>Words List</b></td><td align=center>$wordindexentries</td><td align=center>$wordindexsize</td></tr>";
+
+#--------
+print <<"EOF";
+</table>
+
+<p><hr><b>Re-Index The Site:</b>
+<form action="$config{'scriptindex'}" method="post">
+<input type="hidden" name="password" value="$in{'password'}">
+<input type="hidden" name="command" value="index">
+<input type="submit" value="Re-Index The Site"> (may take a while)
+</form>
+
+<p><hr><b>Delete Files:</b> (re-indexing will overwrite these files)
+<form action="$config{'scriptindex'}" method="post">
+<input type="hidden" name="password" value="$in{'password'}">
+<input type="hidden" name="command" value="deletefiles">
+
+<input type="radio" name="deletefile" value="config">config file
+<br><input type="radio" name="deletefile" value="words:files">index files (words, files)
+<br><input type="radio" name="deletefile" value="words:files:config">all
+
+<br><input type="submit" value="Delete">
+</form>
+
+<hr><b>Configuration</b>
+<form name="changeform" action="$config{'scriptindex'}" method="post">
+<input type="hidden" name="password" value="$in{'password'}">
+<input type="hidden" name="command" value="saveconfig">
+<p><table border=1 cellpadding=5 cellspacing=0>
+<tr>
+<td>New Admin Password:</td>
+<td><input type="password" name="newpass" size=15></td>
+</tr>
+
+<tr>
+<td>Root Directory:</td>
+<td><input type="text" name="root" size=45 value="$config{'root'}"></td>
+</tr>
+
+<tr>
+<td>Data Directory:</td>
+<td><input type="text" name="datadir" size=45 value="$config{'datadir'}"></td>
+</tr>
+
+<tr>
+<td>Your URL:</td>
+<td><input type="text" name="webaddress" size=45 value="$config{'webaddress'}"></td>
+</tr>
+
+<tr><td>Recurse Searching:</td>
+<td>
+<input type="radio" name="recurse" value="1" $recurse> yes (index all sub-directories)
+<br><input type="radio" name="recurse" value="0" $norecurse> no (do no index any sub-directories)
+</td>
+</tr>
+
+<tr>
+<td>Search Directories:</td>
+<td>
+<input type="radio" name="indexall" value=1 $indexall onclick="searchDirsClick(this.value)"> all directories
+<br><input type="radio" name="indexall" value=0 $indexselected onclick="searchDirsClick(this.value)"> selected directories below
+
+<br><input type="text" name="searchdirs" size=45 value="$config{'searchdirs'}">
+<br><select name="addsearchdirs">
+EOF
+#--------
+
+opendir(DIR,"$config{'root'}");
+while ($subdir = readdir DIR) {
+	next if ($subdir =~ /^\./);
+	if (-d "$config{'root'}/$subdir") {
+		push(@searchDirsList,$subdir);
+	}
+}
+close(DIR);
+foreach $subdir (sort(@searchDirsList)) {
+	print "<option value='/$subdir'>/$subdir";
+}
+
+#--------
+print <<"EOF";
+</select>
+<input type="button" onclick="addSearchDir()" value="add">
+<input type="button" onclick="document.changeform.searchdirs.value=''" value="clear">
+</td>
+</tr>
+
+<tr>
+<td>Exclude Directories:</td>
+<td>
+<input type="text" name="excludedirs" size=45 value="$config{'excludedirs'}">
+<br><select name="addexcludedirs">
+EOF
+#--------
+
+opendir(DIR,"$config{'root'}");
+while ($subdir = readdir DIR) {
+	next if ($subdir =~ /^\./);
+	if (-d "$config{'root'}/$subdir") {
+		push(@excludeDirsList,$subdir);
+	}
+}
+close(DIR);
+foreach $subdir (sort(@excludeDirsList)) {
+	print "<option value='/$subdir'>/$subdir";
+}
+
+#--------
+print <<"EOF";
+</select>
+<input type="button" onclick="addExcludeDir()" value="add">
+<input type="button" onclick="document.changeform.excludedirs.value=''" value="clear">
+</td>
+</tr>
+
+<tr>
+<td>Templates:</td>
+<td>
+
+EOF
+#--------
+
+$i = 1;
+@parts = split(/:/,$templates{'default'});
+$prompt = @parts[1];
+$results = @parts[2];
+print "<p>Name = default (manditory) <input type=\"hidden\" name=\"templatename$i\" value=\"default\">";
+print "<br>Prompt File = datadir+<input type=\"text\" name=\"templateprompt$i\" size=25 value=\"$prompt\">";
+print "<br>Results File = datadir+<input type=\"text\" name=\"templateresults$i\" size=25 value=\"$results\">";
+
+$i += 1;
+foreach $key (keys(%templates)) {
+	next if ($key eq 'default');
+	$name = $key;
+	@parts = split(/:/,$templates{$name});
+	$prompt = $parts[1];
+	$results = $parts[2];
+	print "<p>Name = <input type=\"text\" name=\"templatename$i\" value=\"$name\">";
+	print "<br>Prompt File = datadir\+<input type=\"text\" name=\"templateprompt$i\" size=25 value=\"$prompt\">";
+	print "<br>Results File = datadir\+<input type=\"text\" name=\"templateresults$i\" size=25 value=\"$results\">";
+	$i += 1;
+}
+
+#--------
+print <<"EOF";
+
+<p>Name = <input type="text" name="templatename$i" value="">
+<br>Prompt File = datadir+<input type="text" name="templateprompt$i" size=25 value="">
+<br>Results File = datadir+<input type="text" name="templateresults$i" size=25 value="">
+
+</td>
+</tr>
+
+<tr>
+<td>Forums:</td>
+<td>
+type in the datadir from the forum, and the url which you access the forum:
+<br>example:
+<br>data = /cgi-bin/forumdata/
+<br>url = /cgi-bin/forum.pl
+
+EOF
+#--------
+
+$i = 1;
+foreach $key (keys(%forums)) {
+	$data = $key;
+	$url = $forums{$key};
+	print "<p>Data = root+<input type=\"text\" name=\"forumdata$i\" size=25 value=\"$data\">";
+	print "<br>URL = <input type=\"text\" name=\"forumurl$i\" size=25 value=\"$url\">";
+	$i += 1;
+}
+
+#--------
+print <<"EOF";
+
+<p>Data = root+<input type="text" name="forumdata$i" size=25 value="">
+<br>URL = <input type="text" name="forumurl$i" size=25 value="">
+
+</td>
+</tr>
+
+<tr><td colspan=2>
+<input type="submit" value="Save Configuration">
+</td></tr>
+
+</table>
+
+</form>
+
+</html>
+	
+EOF
+}
+
+#-------------------------------------------------------
+# Index the files
+#-------------------------------------------------------
+sub indexSite {
+	umask(72);
+	@parts = split(/:/,$config{'searchdirs'});
+	foreach $dir (@parts) {
+		push(@searchdirs,$dir);
+	}
+	@parts = split(/:/,$config{'excludedirs'});
+	foreach $dir (@parts) {
+		push(@excludedirs,$dir);
+	}
+	
+	$root = $config{'root'};
+	$datadir = $config{'datadir'};
+	
+	$resultstr = "";
+	
+	if (!$shellonly) {$resultstr .= "<html><title>Search Index Results</title>";}
+	$resultstr .= "<h3>Search Index Results:</h3><p>\n\n";
+	
+	FIXLOOP: foreach $dir (@searchdirs) {
+		my($newdir,$part,@parts);
+		@parts = split(/\//,$dir);
+		foreach $part (@parts) {
+			$part =~ s/ +//g;
+			$newdir .= "/$part" if ($part ne "");
+		}
+		foreach $exclude (@excludedirs) {
+			if ($newdir =~ /$exclude/) {
+				push(@excludeddirs,$newdir);
+				next FIXLOOP;
+			}
+		}
+		push(@searchdirsf,$newdir) if (-d "$root$newdir");
+	}
+	if ($config{'recurse'}) {
+		foreach $dir (@searchdirsf) {
+			if (-d "$root$dir") {
+				opendir(DIR,"$root$dir");
+				SWHILE: while ($subdir = readdir DIR) {
+					next if ($subdir =~ /^\./);
+					$realdir = "$root$dir/$subdir";
+					next unless (-d $realdir);
+					foreach $exclude (@excludedirs) {
+						if ($realdir =~ /$exclude/) {
+							push(@excludeddirs,$realdir);
+							next SWHILE;
+						}
+					}
+					push(@searchdirsf,"$dir/$subdir");
+				}
+				closedir(DIR);
+			}
+		}
+	}
+	foreach $dir (@searchdirsf) {
+		opendir(DIR,"$root$dir");
+		while ($file = readdir DIR) {
+			if ($file =~ /(\.html|\.htm|\.phtml|\.shtml|\.php3|\.asp)$/) {  #### extensions to search
+				push(@searchfiles,"$dir/$file");
+			}
+		}
+		closedir(DIR);
+	}
+	
+	foreach $forumdir (keys(%forums)) {
+		opendir(DIR,"$root$forumdir/messages");
+		while ($file = readdir DIR) {
+			next if ($file =~ /^\./);
+			push(@searchfiles,"$forumdir/messages/$file") if ($file =~ /\.txt/);
+		}
+		closedir(DIR);
+	}
+	
+	for ($i=0;$i<@searchfiles;$i++) {
+		$file = $searchfiles[$i];
+		open(FILE,"$root$file");
+		$contents = join('',<FILE>);
+		close(FILE);
+	
+		($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$adate,$mdate,$ctime,$blksize,$blocks)
+		= stat "$root/$file";
+		$sizes{$file} = $size;
+		$modified{$file} = $mdate;
+		$contents =~ s/\n//g;
+		
+		if ($contents =~ /(?i)<title>(.*?)<\/title>?/) {
+			$titles{$file} = $1;
+		}
+		elsif ($contents =~ /(?i)<subject>(.*?)<\/subject>?/) {
+			$titles{$file} = $1;
+		}
+		else {
+			$titles{$file} = "Untitled";
+		}
+		$titles{$file} =~ s/,//g;
+					
+		$contents =~ tr/A-Z/a-z/;
+		# $contents =~ s/<pre>(.*?)<\/pre>//g;
+		$contents =~ s/<[^>]+>/ /g;
+		$contents =~ s/ - / /g;
+		$contents =~ s/'//g;
+		$contents =~ s/[\n\t\`\~\!\@\#\$\%\^\&\*\(\)\+\=\{\}\|\[\]\\\:\"\;\<\>\?\,\.\/0-9]/ /g;
+		@tempwords = split(/ +/,$contents);
+		foreach $word (@tempwords) {
+			@letters = split(//,$word);
+			next if (@letters<=2);
+			next if ($words{$word} =~ /$i /);
+			next if ($word eq "");
+			next if ($word !~ /^[0-9a-z][0-9a-z_]*$/);
+			$words{$word} .= "$i ";
+		}
+	}
+	if ($shellonly) {
+		$resultstr .= "<p>Files indexed:\n";
+	}
+	else {
+		$resultstr .= "<p><table border=1 cellspacing=0 cellpadding=1>";
+		$resultstr .= "<tr><td align=\"center\"><b>#</b></td><td><b>Filename</b></td><td align=\"center\"><b>Size</b></td></tr>";
+	}
+	
+	$totalsize = 0;
+	open(FILE,">$datadir/files");
+	for ($i=0;$i<@searchfiles;$i++) {
+		my($file) = $searchfiles[$i];
+		print FILE "$i,$file,$sizes{$file},$modified{$file},$titles{$file}\n";
+		if ($shellonly) {$resultstr .= "  $i $file\n";}
+		else {$resultstr .= "<tr><td align=\"right\">$i</td><td>$file</td><td align=\"right\">$sizes{$file}</td></tr>\n";}
+		$totalsize += $sizes{$file};
+	}
+	close(FILE);
+	$resultstr .= '</table>';
+	
+	open(FILE,">$datadir/words");
+	foreach $key (keys(%words)) {
+		print FILE "$key = $words{$key}\n";
+	}
+	close(FILE);
+	
+	$totalsize = &round($totalsize/1000,2);
+	
+	if (-e "$datadir/files") {
+		my($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$adate,$mdate,$ctime,$blksize,$blocks)
+		= stat "$datadir/files";
+		$fileindexsize = &round($size/1000,2);
+		$resultstr .= "\nFile index: $fileindexsize KB\n<br>  $datadir/files<br>\n";
+	}
+	else {
+		$resultstr .= "ERROR: unable to write $datadir/files (file index)<br>\n";
+		$error = 1;
+	}
+	if (-e "$datadir/words") {
+		my($dev,$ino,$mode,$nlink,$uid,$gid,$rdev,$size,$adate,$mdate,$ctime,$blksize,$blocks)
+		= stat "$datadir/words";
+		$wordindexsize = &round($size/1000,2);
+		$resultstr .= "Word index: $wordindexsize KB\n<br>  $datadir/words\n\n";
+	}
+	else {
+		$resultstr .= "ERROR: unable to write $datadir/words (word index)\n\n";
+		$error = 1;
+	}
+	
+	if ($error) {
+		$resultstr .= "<p>There was an error while indexing your site\n\n"
+	}
+	else {
+		my($totalindex) = $fileindexsize+$wordindexsize;
+		my($sizeperc) = round(100*($totalindex)/$totalsize,1);
+		$resultstr .= "<p>Total size of files: $totalsize KB<p>\n";
+		$resultstr .= "<p>Total size of index: $totalindex KB ($sizeperc%)\n\n";
+		$resultstr .= "<p>You may now <a href=\"$config{'scriptsearch'}\">Search Your Site</a>\n\n";
+	}
+		
+	$resultstr .= "</body></html>";
+	
+	if ($shellonly) {
+		$resultstr =~ s/<[^>]+>//g;
+	}
+	print $resultstr;
+
+	if (!$shellonly && !$error) {
+		print <<"EOF";
+<form action="$config{'scriptindex'}" method="post">
+<input type="hidden" name="command" value="adminpage">
+<input type="hidden" name="password" value="$in{'password'}">
+<input type="submit" value="Back to MiniSearch Admin">
+</form>
+EOF
+	}
+
+}
+
+#-------------------------------------------
+# some helper routines
+#-------------------------------------------
+
+# get configuration variables
+sub getConfig {
+	if (open(FILE,"searchdata/config")) {
+		@configfile = <FILE>;
+		close(FILE);	
+		foreach $line (@configfile) {
+			if ($line =~ /template = (.*)/) {
+				@parts = split(/:/, $1);
+				$templates{$parts[0]} = $1;
+			}
+			if ($line =~ /forum = (.*)/) {
+				@parts = split(/:/, $1);
+				$forums{$parts[0]} = $parts[1];
+			}
+			elsif ($line =~ /(.*) = (.*)/) {
+				$config{$1} = $2;
+			}
+		}
+	}
+	else {
+		&setDefaultConfig;
+		&generateConfig(1);
+	}
+}
+
+# get form input
+sub ReadParse {
+	local (*in) = @_ if @_;
+	local ($i, $loc, $key, $val);
+	if ($ENV{'REQUEST_METHOD'} eq "GET") {
+		$in = $ENV{'QUERY_STRING'};
+	} elsif ($ENV{'REQUEST_METHOD'} eq "POST") {
+		read(STDIN,$in,$ENV{'CONTENT_LENGTH'});
+	}
+	@in = split(/&/,$in);
+	foreach $i (0 .. $#in) {
+		$in[$i] =~ s/\+/ /g;
+		($key, $val) = split(/=/,$in[$i],2);
+		$key =~ s/%(..)/pack("c",hex($1))/ge;
+		$val =~ s/%(..)/pack("c",hex($1))/ge;
+		$in{$key} .= "\0" if (defined($in{$key}));
+		$in{$key} .= $val;
+	}
+	return 1;
+}
+
+# round $num to $dec decimal places
+sub round {
+	my($num,$dec) = @_;
+	my($exp) = 10**$dec;
+	return(int($num*$exp+$exp/20)/$exp);
+}
+
+# make it look nicer
+sub formattedDate {
+	my($date) = @_;
+	($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime($date);
+	@months = ('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
+	if ($year<100) {$year += 1900;}
+	$fdate = "$months[$mon] $mday, $year";
+	return $fdate;
+}
+
+#--end-----------------------------------------

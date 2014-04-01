@@ -4,7 +4,12 @@ to another.
 If you want to build a FestVox voice with a transformation filter
 see below.
 
+If you want to build a transformation filter for a clustergen voice
+see below below.
+
+========
 TRAINING
+========
 
 For example suppose you wanted to convert some a database of waveform
 files to a new voice.  Let's call the databases awb, and the target
@@ -16,8 +21,8 @@ speaker bdl record these, so you have the same recordings of teh
 
 Set up the following directory structure
 
-    mkdir vc
-    cd vc
+    mkdir voice_conversion
+    cd voice_conversion
     mkdir list
     mkdir wav
 
@@ -73,7 +78,9 @@ Then
 Converted waveforms will be generated in
     test/wav/awb-bdl/
 
+=============================
 FESTVOX Transformation Voice
+=============================
 
 These instructions help you build a full festival voice for the
 target speaker based on an existing Festival diphone voice.
@@ -89,7 +96,8 @@ In order to get the basic directory structure we setup a
 unit selection voice (even though we wont build one)
 
    mkdir cmu_us_awb
-   $FESTVOXDIR/src/setup_clunits cmu us awb
+   cd cmu_us_awb
+   $FESTVOXDIR/src/unitsel/setup_clunits cmu us awb
    
 We then setup this voice for transformation
 
@@ -103,6 +111,11 @@ be used and the constructed transformation filter will act on it.
 
    $FESTVOXDIR/src/vc/build_transform default_us
 
+Generate the diphone versions of the prompts (that will be the source
+waveform files for the transformation)
+
+   ./bin/do_build build_prompts_waves etc/txt.transform.data
+
 Now we must collect the target speech, the prompts are in
 etc/txt.transform.data and we can collect the using prompt_them
 or any other waveform recording tool, the resulting waveform
@@ -110,7 +123,7 @@ files should be in wav/.
 
    ./bin/prompt_them etc/txt.transform.data
 
-Once collected, check they are recorded properly.  Now we can start
+Once collected, check they are recorded properly.   Now we can start
 the actual training which may take up to an hour (for 30 sentences, or
 can take longer for larger training sets).
 
@@ -137,9 +150,61 @@ The resulting distribution
 
    festvox_cmu_us_awb_transform.tar.gz
 
-Can be installed on other versions of festival, but becuase the filter
+Can be installed on other versions of festival, but because the filter
 use binary programs it will only run on the same architectures as you
 built the filter on.
+
+==========================================
+FESTVOX Transformation Voice in Clustergen
+==========================================
+
+This is much more experimental but this explains how to add a
+gmm-transformation filter to an existing clustergen voice
+
+In a newly built clustergen voice (or an existing one, by updating)
+
+  cp -p  $FESTVOXDIR/src/clustergen/clustergen.scm festvox/
+
+Note you technically don't need to build a complete voice you only need the
+runtime version (festival/trees/$VOICENAME* and festvox/*.scm)
+
+Setup the vc directories
+
+   $FESTVOXDIR/src/vc/build_transform setup
+
+Make a data file for the files you want to use for transformation
+
+   $FESTVOXDIR/src/vc/build_transform default_us
+
+This puts the first 30 utterances into etc/txt.transform.data
+
+Put the waveform files you want to use as targets in wav-target/
+
+Traing the model, this synthesizes the utterances in
+etc/txt.transform.data with the current CG synthesizer and dumps the
+mcep, f0 and npow files ready for training the transformation model.
+This will take an hour or so
+
+   $FESTVOXDIR/src/vc/build_transform train_cg
+
+You need to copy in the various other runtime files
+
+   $FESTVOXDIR/src/vc/build_transform festvox
+
+If you now edit festvox/clustergen.scm and set 
+
+   (defvar cg:gmm_transform t)
+
+It should call the transformation model after synthesis of the base voice
+
+This still has issues on having multiple voices at once in festival.
+
+
+
+
+
+
+
 
 
    

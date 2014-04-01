@@ -55,11 +55,11 @@
 
 extern int sp_warning;
 
-void fvoper(FVECTOR x, char *op, FVECTOR y)
+void fvoper(FVECTOR x, const char *op, FVECTOR y)
 {
     long k;
     int reverse = 0;
-    char *op2 = op;
+    const char *op2 = op;
 
     if (strveq(op2, "!")) {
 	reverse = 1;
@@ -345,11 +345,11 @@ void fvoper(FVECTOR x, char *op, FVECTOR y)
     return;
 }
 
-void dvoper(DVECTOR x, char *op, DVECTOR y)
+void dvoper(DVECTOR x, const char *op, DVECTOR y)
 {
     long k;
     int reverse = 0;
-    char *op2 = op;
+    const char *op2 = op;
 
     if (strveq(op2, "!")) {
 	reverse = 1;
@@ -631,7 +631,7 @@ void dvoper(DVECTOR x, char *op, DVECTOR y)
     return;
 }
 
-FVECTOR xfvoper(FVECTOR a, char *op, FVECTOR b)
+FVECTOR xfvoper(FVECTOR a, const char *op, FVECTOR b)
 {
     FVECTOR c;
 
@@ -641,7 +641,7 @@ FVECTOR xfvoper(FVECTOR a, char *op, FVECTOR b)
     return c;
 }
 
-DVECTOR xdvoper(DVECTOR a, char *op, DVECTOR b)
+DVECTOR xdvoper(DVECTOR a, const char *op, DVECTOR b)
 {
     DVECTOR c;
 
@@ -651,11 +651,11 @@ DVECTOR xdvoper(DVECTOR a, char *op, DVECTOR b)
     return c;
 }
 
-void fvscoper(FVECTOR x, char *op, float t)
+void fvscoper(FVECTOR x, const char *op, float t)
 {
     long k;
     int reverse = 0;
-    char *op2 = op;
+    const char *op2 = op;
 
     if (strveq(op2, "!")) {
 	reverse = 1;
@@ -771,11 +771,11 @@ void fvscoper(FVECTOR x, char *op, float t)
     return;
 }
 
-void dvscoper(DVECTOR x, char *op, double t)
+void dvscoper(DVECTOR x, const char *op, double t)
 {
     long k;
     int reverse = 0;
-    char *op2 = op;
+    const char *op2 = op;
 
     if (strveq(op2, "!")) {
 	reverse = 1;
@@ -891,7 +891,7 @@ void dvscoper(DVECTOR x, char *op, double t)
     return;
 }
 
-FVECTOR xfvscoper(FVECTOR a, char *op, float t)
+FVECTOR xfvscoper(FVECTOR a, const char *op, float t)
 {
     FVECTOR c;
 
@@ -901,7 +901,7 @@ FVECTOR xfvscoper(FVECTOR a, char *op, float t)
     return c;
 }
 
-DVECTOR xdvscoper(DVECTOR a, char *op, double t)
+DVECTOR xdvscoper(DVECTOR a, const char *op, double t)
 {
     DVECTOR c;
 
@@ -911,11 +911,11 @@ DVECTOR xdvscoper(DVECTOR a, char *op, double t)
     return c;
 }
 
-void svoper(SVECTOR a, char *op, SVECTOR b)
+void svoper(SVECTOR a, const char *op, SVECTOR b)
 {
     long k;
     int reverse = 0;
-    char *op2 = op;
+    const char *op2 = op;
 
     if (strveq(op2, "!")) {
 	reverse = 1;
@@ -1007,11 +1007,11 @@ void svoper(SVECTOR a, char *op, SVECTOR b)
     return;
 }
 
-void lvoper(LVECTOR a, char *op, LVECTOR b)
+void lvoper(LVECTOR a, const char *op, LVECTOR b)
 {
     long k;
     int reverse = 0;
-    char *op2 = op;
+    const char *op2 = op;
 
     if (strveq(op2, "!")) {
 	reverse = 1;
@@ -1103,7 +1103,7 @@ void lvoper(LVECTOR a, char *op, LVECTOR b)
     return;
 }
 
-SVECTOR xsvoper(SVECTOR a, char *op, SVECTOR b)
+SVECTOR xsvoper(SVECTOR a, const char *op, SVECTOR b)
 {
     SVECTOR c;
 
@@ -1113,7 +1113,7 @@ SVECTOR xsvoper(SVECTOR a, char *op, SVECTOR b)
     return c;
 }
 
-LVECTOR xlvoper(LVECTOR a, char *op, LVECTOR b)
+LVECTOR xlvoper(LVECTOR a, const char *op, LVECTOR b)
 {
     LVECTOR c;
 
@@ -1123,11 +1123,11 @@ LVECTOR xlvoper(LVECTOR a, char *op, LVECTOR b)
     return c;
 }
 
-void svscoper(SVECTOR a, char *op, double t)
+void svscoper(SVECTOR a, const char *op, double t)
 {
     long k;
     int reverse = 0;
-    char *op2 = op;
+    const char *op2 = op;
 
     if (strveq(op2, "!")) {
 	reverse = 1;
@@ -1194,11 +1194,11 @@ void svscoper(SVECTOR a, char *op, double t)
     return;
 }
 
-void lvscoper(LVECTOR a, char *op, double t)
+void lvscoper(LVECTOR a, const char *op, double t)
 {
     long k;
     int reverse = 0;
-    char *op2 = op;
+    const char *op2 = op;
 
     if (strveq(op2, "!")) {
 	reverse = 1;
@@ -1266,7 +1266,7 @@ void lvscoper(LVECTOR a, char *op, double t)
 }
 
 
-SVECTOR xsvscoper(SVECTOR a, char *op, double t)
+SVECTOR xsvscoper(SVECTOR a, const char *op, double t)
 {
     SVECTOR c;
 
@@ -1276,7 +1276,7 @@ SVECTOR xsvscoper(SVECTOR a, char *op, double t)
     return c;
 }
 
-LVECTOR xlvscoper(LVECTOR a, char *op, double t)
+LVECTOR xlvscoper(LVECTOR a, const char *op, double t)
 {
     LVECTOR c;
 
@@ -2014,7 +2014,7 @@ DVECTOR xdvfindv(DVECTOR x)
     return y;
 }
 
-DVECTOR xdvsceval(DVECTOR x, char *op, double t)
+DVECTOR xdvsceval(DVECTOR x, const char *op, double t)
 {
     long k;
     DVECTOR y;
@@ -2065,7 +2065,7 @@ DVECTOR xdvsceval(DVECTOR x, char *op, double t)
     return y;
 }
 
-LVECTOR xdvscfind(DVECTOR x, char *op, double t)
+LVECTOR xdvscfind(DVECTOR x, const char *op, double t)
 {
     DVECTOR y;
     LVECTOR z;
@@ -2078,7 +2078,7 @@ LVECTOR xdvscfind(DVECTOR x, char *op, double t)
     return z;
 }
 
-DVECTOR xdvscfindv(DVECTOR x, char *op, double t)
+DVECTOR xdvscfindv(DVECTOR x, const char *op, double t)
 {
     DVECTOR y;
     LVECTOR idx;

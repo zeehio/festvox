@@ -37,7 +37,7 @@
 (set! seg_dur_info (load "festival/dur/etc/durs.meanstd" t))
 
 (define (zscore_log_dur seg)
-  (let ((di (assoc (item.name seg) seg_dur_info)))
+  (let ((di (assoc_string (item.name seg) seg_dur_info)))
     (cond
      ((not di)
       (format stderr "zscore_log_dur: %s no info found\n" 

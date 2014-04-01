@@ -43,11 +43,11 @@
 ##                                                                   ##
 #######################################################################
 
-if ( $# == 0 ) then
-   echo "vc_train FROMWAVDIR TOWAVDIR"
-   echo "GMM voice conversion training script"
-   echo "e.g. $FESTVOXDIR/src/vc/scripts/vc_train diphones/kal wav/awb"
-endif
+#if ( $# == 0 ) then
+#   echo "vc_train FROMWAVDIR TOWAVDIR"
+#   echo "GMM voice conversion training script"
+#   echo "e.g. $FESTVOXDIR/src/vc/scripts/vc_train diphones/kal wav/awb"
+#endif
 
 ###########################################################
 #  You may want to change some of the following
@@ -61,10 +61,21 @@ set list_dir = ./list
 set src_dir  = $FESTVOXDIR/src/vc/src
 set csh_dir  = $FESTVOXDIR/src/vc/scripts/GMMMAP
 ###########################################################
-if ( $1 == "train") then
+if ( $1 == "train_cg") then
+set SYNORG = 2  # source is from CG voice
 set EXPAR = 1	# Parameter Extraction
 set F0STS = 1	# Calculation of Statistics of F0
 set TRSPC = 1	# Training of Spectral Conversion Function
+set TRSPCMLLR = 0	# Training of Spectral Conversion Function MLLR
+set GVSTS = 1	# Calculation of Statistics of Global Variance
+set CPPAR = 1	# Copy Parameter Files
+set CVWAV = 0	# Test of Voice Conversion
+endif
+if ( $1 == "train") then
+set EXPAR = 1	# Parameter Extraction
+set F0STS = 1	# Calculation of Statistics of F0
+set TRSPC = 1	# Training of Spectral Conversion Function GMM
+set TRSPCMLLR = 0	# Training of Spectral Conversion Function MLLR
 set GVSTS = 1	# Calculation of Statistics of Global Variance
 set CPPAR = 1	# Copy Parameter Files
 set CVWAV = 0	# Test of Voice Conversion
@@ -76,13 +87,15 @@ set TRSPC = 0	# Training of Spectral Conversion Function
 set GVSTS = 0	# Calculation of Statistics of Global Variance
 set CPPAR = 0	# Copy Parameter Files
 set CVWAV = 1	# Test of Voice Conversion
+set TRSPCMLLR = 0	# Training of Spectral Conversion Function MLLR
+set MLLR = 0
 endif
 
 ####################
 set olist = $list_dir/$org"_tr.list"	# list of source files for training
 set tlist = $list_dir/$tar"_tr.list"	# list of target files for training
 set itnum = 2				# the number of iterations
-set clsnum = 64				# the number of mixtures
+set clsnum = 32				# the number of mixtures
 ###########################################################
 
 # Parameter Extraction
@@ -101,6 +114,9 @@ if ($EXPAR == 1) then
 			$src_dir \
 			$olist
 	else
+            if ($SYNORG == 2) then
+                true; # do nothing
+            else
 		# F0 extraction
 		echo "# F0 extraction for source speech ..."
 		csh $csh_dir/get_f0.csh \
@@ -113,6 +129,7 @@ if ($EXPAR == 1) then
 			$work_dir \
 			$src_dir \
 			$olist
+            endif
 	endif
 
 	# F0 extraction
@@ -160,7 +177,7 @@ if ($F0STS == 1) then
 	echo "### Statistics of F0 has been extracted. ###"
 endif
 
-# Training of Spectral Conversion Function
+# Training of Spectral Conversion Function GMM
 if ($TRSPC == 1) then
         # iterative training of spectral conversion function
 	csh $csh_dir/GMMMAP-EstGMM.csh \
@@ -174,6 +191,31 @@ if ($TRSPC == 1) then
 		$clsnum \
 		$itnum
 
+	# error check
+	if (-r DUMMY-ERROR-LOG) then
+		echo "### ERROR ###"
+		rm DUMMY-ERROR-LOG
+		exit
+	endif
+
+	echo "### Training of spectral conversion function has been finished. ###"
+endif
+
+# Training of Spectral Conversion Function MLLR
+if ($TRSPCMLLR == 1) then
+        # iterative training of spectral conversion function
+	csh $csh_dir/MLLR-Est.csh \
+		$work_dir \
+		$src_dir \
+		$csh_dir \
+		$org \
+		$tar \
+		$olist \
+		$tlist \
+		$clsnum \
+		$itnum
+
+        exit
 	# error check
 	if (-r DUMMY-ERROR-LOG) then
 		echo "### ERROR ###"
@@ -273,32 +315,40 @@ endif
 
 # Test of Voice Conversion
 if ($CVWAV == 1) then
-	# Parameter File List
-	set otplist = $work_dir/param/$org"-"$tar"_param.list"
+        # Parameter File List
+        set otplist = $work_dir/param/$org"-"$tar"_param.list"
 
-	echo "# test of voice conversion ..."
-	foreach owav ($work_dir/test/wav/$org/*.wav)
-		set cvwav = $work_dir/test/wav/$org"-"$tar/$owav:t
-		if ($SYNORG == 1) then
-			set outt = $work_dir/test/utt/$org/$owav:t:r.utt
-			csh $csh_dir/../VConvFestival.csh \
-				$src_dir \
-				$otplist \
-				$owav \
-				$outt \
-				$cvwav
-		else
-			csh $csh_dir/../VConv.csh \
-				$src_dir \
-				$otplist \
-				$owav \
-				$cvwav
-		endif
-		if (!(-r $cvwav)) then
-			echo "Error: "$cvwav
-			exit
-		else
-			echo "Output: "$cvwav
-		endif
-	end
+        echo "# test of voice conversion ..."
+        foreach owav ($work_dir/test/wav/$org/*.wav)
+            set cvwav = $work_dir/test/wav/$org"-"$tar/$owav:t
+            if ($MLLR == 1) then
+                csh $csh_dir/../VConv_mllr.csh \
+                            $src_dir \
+                            $work_dir/mllr/$org"-"$tar \
+                            $owav \
+                            $work_dir/test/wav/$org"-"$tar/$owav:t
+            else
+                if ($SYNORG == 1) then
+                        set outt = $work_dir/test/utt/$org/$owav:t:r.utt
+                        csh $csh_dir/../VConvFestival.csh \
+                                $src_dir \
+                                $otplist \
+                                $owav \
+                                $outt \
+                                $work_dir/test/wav/$org"-"$tar/$owav:t
+                else
+                        csh $csh_dir/../VConv.csh \
+                                $src_dir \
+                                $otplist \
+                                $owav \
+                                $work_dir/test/wav/$org"-"$tar/$owav:t
+                endif
+            endif
+            if (!(-r $work_dir/test/wav/$org"-"$tar/$owav:t)) then
+                    echo "Error: "$work_dir/test/wav/$org"-"$tar/$owav:t
+                    exit
+            else
+                    echo "Output: "$work_dir/test/wav/$org"-"$tar/$owav:t
+            endif
+        end
 endif

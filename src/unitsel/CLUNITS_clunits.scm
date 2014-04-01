@@ -295,5 +295,22 @@ Define voice for LANG."
       "1"
       "0"))
 
+(define (cg_break s)
+  "(cg_break s)
+0, if word internal, 1 if word final, 4 if phrase final, we ignore 
+3/4 distinguinction in old syl_break"
+  (let ((x (item.feat s "syl_break")))
+    (cond
+     ((string-equal "0" x)
+      (string-append x)
+      )
+     ((string-equal "1" x)
+      (string-append x)
+      )
+     ((string-equal "0" (item.feat s "R:SylStructure.parent.n.name"))
+      "4")
+     (t
+      "3"))))
+
 (provide 'INST_LANG_VOX_clunits)
 

@@ -76,21 +76,42 @@ Basic lexicon should (must ?) have basic letters, symbols and punctuation."
 (define (INST_LANG_lts_function word features)
   "(INST_LANG_lts_function WORD FEATURES)
 Return pronunciation of word not in lexicon."
-  (if (not boundp 'INST_LANG_lts_rules)
-      (require 'INST_LANG_lts_rules))
-  (let ((dword (downcase word)) (phones) (syls))
-    (set! phones (lts_predict dword INST_LANG_lts_rules))
-    (set! syls (INST_LANG_lex_syllabify_phstress phones))
-    (list word features syls)))
 
-;; utf8 letter based one
-;(define (INST_LANG_lts_function word features)
-;  "(INST_LANG_lts_function WORD FEATURES)
-;Return pronunciation of word not in lexicon."
-;  (let ((dword word) (phones) (syls))
-;    (set! phones (utf8explode dword))
+  ;; If you have nothing ...
+  (format t "Unknown word %s\n" word)
+  (list word features nil)
+
+  ;; If you have lts rules (trained or otherwise)
+;  (if (not boundp 'INST_LANG_lts_rules)
+;      (require 'INST_LANG_lts_rules))
+;  (let ((dword (downcase word)) (phones) (syls))
+;    (set! phones (lts_predict dword INST_LANG_lts_rules))
 ;    (set! syls (INST_LANG_lex_syllabify_phstress phones))
-;    (list word features syls)))
+;    (list word features syls))
+  )
+
+(define (INST_LANG_map_modify ps)
+  (cond
+   ((null ps) nil)
+   ((null (cdr ps)) ps)
+   ((assoc_string (string-append (car ps) (cadr ps))
+                   INST_LANG_VOX_char_phone_map)
+    (cons
+     (string-append (car ps) (cadr ps))
+     (INST_LANG_map_modify (cddr ps))))
+   (t
+    (cons
+     (car ps)
+     (INST_LANG_map_modify (cdr ps))))))
+
+(define (INST_LANG_map_phones p)
+  (cond
+   ((null p) nil)
+   (t
+    (let ((a (assoc_string (car p) INST_LANG_VOX_char_phone_map)))
+      (cond
+       (a (cons (cadr a) (INST_LANG_map_phones (cdr p))))
+       (t (INST_LANG_map_phones (cdr p))))))))
 
 (define (INST_LANG_is_vowel x)
   (string-equal "+" (phone_feature x "vc")))
@@ -129,6 +150,115 @@ t if this is a syl break, nil otherwise."
      (set! syls (cons (list (reverse syl) stress) syls)))
     (reverse syls)))
 
+    ;; utf8-sampa map based on unitran 
+(if (probe_file (path-append INST_LANG_VOX::dir "festvox/INST_LANG_VOX_char_phone_map.scm"))
+    (begin
+      (set! INST_LANG_VOX_char_phone_map
+            (load (path-append INST_LANG_VOX::dir 
+                               "festvox/INST_LANG_VOX_char_phone_map.scm") t))
+	(load (path-append INST_LANG_VOX::dir 
+                           "festvox/unicode_sampa_mapping.scm"))
+
+    ;; utf8-indic-sampa letter based one
+    (define (INST_LANG_lts_function word features)
+      "(INST_LANG_lts_function WORD FEATURES)
+Return pronunciation of word not in lexicon."
+      (let ((dword word) (phones) (syls) (aphones))
+        (set! aphones (INST_LANG_map_modify (utf8explode dword)))
+        (set! phones (INST_LANG_map_phones aphones))
+	(set! phones (sampa_lookup phones))
+;        (set! phones (indic_unicode_lts sphones))
+        (set! syls (INST_LANG_lex_syllabify_phstress phones))
+        (list word features syls)))
+    ))
+
+(define (sampa_lookup gphones)
+  (let ((phlist nil) (sp nil))
+    (mapcar 
+     (lambda (gg)
+       (set! sp (assoc_string gg unicode_sampa_mapping))
+       (if sp
+           (set! phlist (append (car (cadr sp)) phlist))
+           (set! phlist (cons gg phlist))))
+     gphones)
+    (reverse phlist)))
+
+(define (indic_unicode_lts phlist)
+	(set! finallist (list))
+	(set! graphemecount 0)
+	(set! prevgrapheme (list))
+	(set! totgcnt (- (length phlist) 1))
+	(mapcar (lambda (ggg)
+		(if (symbol? (car ggg))
+		(begin
+		(cond
+			;; schwa deletion for the last consonant
+			((equal? graphemecount totgcnt)
+			(begin
+				(if (string-equal (phone_feature (car ggg) 'vc) "-")
+				(begin 
+					(if (string-equal (phone_feature (car prevgrapheme) 'vc) "-") 
+					(set! finallist (append  finallist prevgrapheme)))
+					;(set! finallist (append finallist (list (car ggg)))) ;appropriate for hindi
+					(set! finallist (append finallist  ggg)) ; for generic (non-schwa final) indic
+				)
+				(begin 
+					(if (string-equal (phone_feature (car prevgrapheme) 'vc) "-") 
+					(set! finallist (append finallist (list (car prevgrapheme)))))
+					(set! finallist (append finallist (list (car ggg))))
+				))
+			))
+			;; generic treatment for an intermediate grapheme
+			((and (> graphemecount 0) (< graphemecount totgcnt))
+			(begin
+				(cond 
+					;; If current is vowel, remove the previous schwa
+					((and (string-equal (phone_feature (car ggg) 'vc) "+") (string-equal (phone_feature (car prevgrapheme) 'vc) "-"))
+					(begin 
+						(set! finallist (append finallist (list (car prevgrapheme))))
+						(set! finallist (append finallist (list (car ggg))))
+					))
+					;; If current is consonant and previous is consonant, dump all of previous 
+					((and  (string-equal (phone_feature (car ggg) 'vc) "-") (string-equal (phone_feature (car prevgrapheme) 'vc) "-"))
+					(set! finallist (append finallist prevgrapheme)))
+					(t 
+					 t)
+				)
+			))
+			((and (eq? graphemecount 0) (string-equal (phone_feature (car ggg) 'vc) "+"))
+				(set! finallist (list (car ggg)))
+			)
+			(t 
+			t)
+		)
+		(set! graphemecount (+ 1 graphemecount))
+		(set! prevgrapheme ggg)
+		)
+		(begin 
+			(cond
+				((equal? (car ggg) '(P))
+					(set! finallist (append finallist (list (car prevgrapheme))))
+					(set! prevgrapheme (list))
+				)
+				((equal? (car ggg) '(M))
+					(if (string-equal (phone_feature (car prevgrapheme) 'vc) "-") (set! finallist (append finallist prevgrapheme)))
+					(set! finallist (append finallist (list "nB")))
+					(set! prevgrapheme (list))
+				)
+				((equal? (car ggg) '(CD))
+					(if (string-equal (phone_feature (car prevgrapheme) 'vc) "-") (set! finallist (append finallist prevgrapheme)))
+					(set! finallist (append finallist (list "nB")))
+					(set! prevgrapheme (list))
+				)
+				(t
+				t)
+				;(format t "debug: todo \n")
+			)
+			(set! graphemecount (+ 1 graphemecount))
+		)
+	)
+	) phlist)
+finallist)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;
@@ -198,6 +328,8 @@ A postlexical rule form correcting phenomena over word boundaries."
     (lex.set.compile.file (path-append INST_LANG_VOX::dir 
                                        "festvox/INST_LANG_lex.out")))
 (INST_LANG_addenda)
+(if (probe_file (path-append INST_LANG_VOX::dir "festvox/INST_LANG_addenda.scm"))
+    (load (path-append INST_LANG_VOX::dir "festvox/INST_LANG_addenda.scm")))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;

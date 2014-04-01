@@ -35,12 +35,12 @@
 ;;;                                                                     ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(define (load_all_utts files)
+(define (load_all_utts promptfile)
   (mapcar
    (lambda (f)
-     (format t "loading %s\n" f)
-     (utt.load nil (format nil "festival/utts/%s.utt" f)))
-   files))
+     (format t "loading %s\n" (car f))
+     (utt.load nil (format nil "festival/utts/%s.utt" (car f))))
+   (load promptfile t)))
 
 (defvar diphone_table nil)
 
@@ -185,12 +185,12 @@ Save a diphone index as best you can."
      diphs)
     (fclose dout)))
 
-(define (make_diphone_index fileids indexfile)
+(define (make_diphone_index promptfile indexfile)
   "(make_diphone_index utts indexfile)
 Find diphones in utts and build a diphone index in indexfile."
-  (set! utts (load_all_utts fileids))
+  (set! utts (load_all_utts promptfile))
   (build_all_diphone_list utts)
-  (set! diphlist (select-diphones-1 diphone_table))
+  (set! diphlist (select-diphones-2 diphone_table))
   (save_diphone_index diphlist indexfile))
   
 

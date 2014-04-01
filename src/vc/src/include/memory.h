@@ -64,7 +64,7 @@ extern void fmatfree(float **mat, int row);
 extern double **dmatalloc(int row, int col);
 extern void dmatfree(double **mat, int row);
 
-extern char *strclone(char *string);
+extern char *strclone(const char *string);
 
 #define xalloc(n, type) (type *)safe_malloc((unsigned)(n)*sizeof(type))
 #define xrealloc(p, n, type) (type *)safe_realloc((char *)(p),(unsigned)(n)*sizeof(type))

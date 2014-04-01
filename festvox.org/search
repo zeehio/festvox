@@ -1,0 +1,297 @@
+#!/usr/bin/perl
+#-------------------------------------------
+# MiniSearch v0.2
+# Personal Website Search Engine
+# http://www.dansteinman.com/minisearch/
+#
+# Copyright (C) 1999 Dan Steinman
+# Distributed under the terms of the of the GNU General Public License
+# You may modify this progam, redistribute it in it's entirety,
+# but any significant improvements must be made public
+# Read the LICENSE file for more details
+#-------------------------------------------
+# search
+# gets and displays the results of a query
+#-------------------------------------------
+
+#-------------------------------------------
+
+if (-e "searchdata/config") {
+	&getConfig;
+	&ReadParse;
+	
+	print "Content-type: text/html\n\n";
+	
+	$root = $config{'root'};
+	$datadir = $config{'datadir'};
+	$webaddress = $config{'webaddress'};
+
+	$view = $in{'view'} || 'default';
+	@parts = split(/:/,$templates{$view});
+	$promptpage = "$datadir$parts[1]";
+	$resultspage = "$datadir$parts[2]";
+
+	$qstr = $ENV{'QUERY_STRING'};
+
+	if ($qstr eq "") {
+		&displayPrompt;
+	}
+	else {
+		&displayResults;
+	}
+}
+else {
+	# if no config go to searchindex to create one
+	print "Location: searchindex.pl\n\n";
+	exit(0);
+}
+
+#-------------------------------------------
+# write the search prompt page
+sub displayPrompt {
+	open(FILE,"$promptpage");
+	$output = join('',<FILE>);
+	close(FILE);
+	print $output;
+}
+
+#-------------------------------------------
+# show the results of the search
+sub displayResults {
+
+if ($in{'query'} eq "") {
+	&displayPrompt;
+	exit(0);
+}
+
+$in{'query'} =~ s/'//g;
+$in{'query'} =~ tr/A-Z/a-z/;
+@queries = split(/ /,$in{'query'});  # the words to search for
+$totalqueries = @queries;
+$match = ($in{'match'} || "all");
+$set = ($in{'set'} || 1);
+$max = ($in{'max'} || 10);
+
+$where = ($in{'where'} || 'all');
+# convert if the where directory was a forum
+if ($where ne 'all') {
+	@wheredirs = split(/:/,$where); # split in case there were multiple directories to filter
+	for ($i=0;$i<@wheredirs;$i++) {
+		foreach $forumdir (keys(%forums)) {
+			if ($wheredirs[$i] eq $forums{$forumdir}) {
+				$wheredirs[$i] = $forumdir;
+			}
+		}
+	}
+}
+
+# retrieve the list of files and get the size/date/titles
+open(FILE,"$datadir/files");
+while ($line = <FILE>) {
+	@parts = split(/,/,$line);
+	push(@files,$parts[1]);
+	$file = $parts[1];
+	$matches{$file} = 0;
+	$sizes{$file} = $parts[2];
+	$dates{$file} = $parts[3];
+	$titles{$file} = $parts[4];
+}
+close(FILE);
+
+# split words
+open(FILE,"$datadir/words");
+while (<FILE>) {
+	next unless s/^(.*?) = \s*//;
+	$words{$1} = [ split ];
+}
+close(FILE);
+
+# find the potentially matched filenames
+foreach $query (@queries) {  # loop through each of the query words
+	if (@{$words{$query}}) {  # if the word has an associated file
+		foreach $index (@{$words{$query}}) {
+			$potmatches{$files[$index]} += 1;  # mark the file as a potential match by uping the potmatches count
+		}
+	}
+}
+
+# loop through all the potentially matched files and determine if it is a true match
+foreach $file (keys(%potmatches)) {
+	# skip if 
+	next if ($match eq "any" && $potmatches{$file} == 0);
+
+	# skip a potential match if the number of queries found was less than the number of queries searched for
+	next if ($match eq "all" && $potmatches{$file} < $totalqueries);
+	
+	if ($where ne "all") {  # if all queries are needed to be matched
+		foreach $wheredir (@wheredirs) {  # if where was given only make those filenames final matches
+			if ($file =~ /^$wheredir/) {
+				push(@matches,$file);
+			}
+		}
+	}
+	else {
+		push(@matches,$file);  # if any queries are needed add to final matches
+	}
+}
+
+$nummatches = @matches;
+if ($in{'max'} eq 'unlimited') {$max = $nummatches;}
+
+# display the results page
+
+open(FILE,"$resultspage");
+$output = join('',<FILE>);
+close(FILE);
+
+$output =~ s/##QUERY##/$in{'query'}/g;
+$output =~ s/##NUMMATCHES##/$nummatches/g;
+$output =~ s/##SCRIPTSEARCH##/$config{'scriptsearch'}/g;
+
+if ($nummatches > 0) {
+	$lastmatch = $max+($set-1)*$max;
+	$lastmatch = $nummatches if ($lastmatch>$nummatches);
+	for ($i=($set-1)*$max;$i<$lastmatch;$i++) {
+		$file = $matches[$i];
+		$ip1 = $i+1;
+		my($ksize) = ($sizes{$file}/1000);
+		$size = &round($ksize,1);
+		$date = &formattedDate($dates{$file});
+                $date =~ s/ 1([0-9][0-9])$/ 20$1/;
+		# convert the url for the forum messages
+		$url = $file;
+		foreach $dir (keys(%forums)) {
+			if ($file =~ /$dir/ && $file =~ /(.*)\/(.*)\.txt/) {
+				$url = "$forums{$dir}\?msg=$2";
+			}
+		}		
+		$resultstr .= "<p><b>$ip1.</b> <a href=\"$url\">$titles{$file}</a>";
+		$resultstr .= "<br><b>URL:</b> $config{'webaddress'}$url";
+		$resultstr .= "<br><b>Size:</b> ${size}KB, <b>Date:</b> $date";
+
+	}
+	$numsets = int($nummatches/$max)+1;
+	$next = $set+1;
+	$previous = $set-1;
+	$qstr =~ s/\&set=(.*[0-9])//;
+	$qstr = "$config{'scriptsearch'}?$qstr&set=";
+}
+
+$resultstr .= "<table><tr</td><p><form action=\"search\" method=\"get\">";
+$resultstr .= "<td><input name=\"query\" type=\"text\" size=20 value=\"$in{'query'}\"></td>";
+$resultstr .= "<input type=\"hidden\" name=\"match\" value=\"$in{'match'}\">";
+$resultstr .= "<input type=\"hidden\" name=\"max\" value=\"$in{'max'}\">";
+$resultstr .= "<input type=\"hidden\" name=\"where\" value=\"$in{'where'}\">";
+$resultstr .= "<input type=\"hidden\" name=\"view\" value=\"$in{'view'}\">";
+$resultstr .= "<input type=\"submit\" value=\"Search\"></form></td></tr></table>";
+
+# the number link bar "more matches"
+if ($numsets>1) {
+	$resultstr .= "<p>More Matches:<br>";
+	if ($set!=1) {
+		$resultstr .= "<a href=\"${qstr}${previous}\">Previous</a> | ";
+	}
+	if ($set>20 && $numsets>20) {$resultstr .= " <a href=\"${qstr}20\">&lt;</a> ";}
+	if ($numsets>20) {
+		if ($set>20) {
+			$startset = 21;
+			$endset = $numsets;
+		}
+		else {
+			$startset = 1;
+			$endset = 20;
+		}
+	}
+	else {
+		$startset = 1;
+		$endset = $numsets;
+	}
+	
+	for ($i=$startset;$i<=$endset;$i++) {
+		if ($i == $set) {
+			$resultstr .= "$i ";
+		}
+		else {
+			$resultstr .= "<a href=\"$qstr$i\">$i</a> ";
+		}
+	}
+	if ($set<=20 && $numsets>20) {$resultstr .= " <a href=\"${qstr}21\">&gt;</a> ";}
+	if ($set<$numsets) {
+		$resultstr .= "| <a href=\"${qstr}${next}\">Next</a>";
+	}
+}
+
+$output =~ s/##RESULTS##/$resultstr/;
+
+print $output;
+
+}
+
+#-------------------------------------------
+# some helper routines
+#-------------------------------------------
+
+# get configuration variables
+sub getConfig {
+	if (open(FILE,"searchdata/config")) {
+		@configfile = <FILE>;
+		close(FILE);	
+		foreach $line (@configfile) {
+			if ($line =~ /template = (.*)/) {
+				@parts = split(/:/, $1);
+				$templates{$parts[0]} = $1;
+			}
+			if ($line =~ /forum = (.*)/) {
+				@parts = split(/:/, $1);
+				$forums{$parts[0]} = $parts[1];
+			}
+			elsif ($line =~ /(.*) = (.*)/) {
+				$config{$1} = $2;
+			}
+		}
+	}
+	else {
+		&setDefaultConfig;
+		&generateConfig(1);
+	}
+}
+
+# get form input
+sub ReadParse {
+	local (*in) = @_ if @_;
+	local ($i, $loc, $key, $val);
+	if ($ENV{'REQUEST_METHOD'} eq "GET") {
+		$in = $ENV{'QUERY_STRING'};
+	} elsif ($ENV{'REQUEST_METHOD'} eq "POST") {
+		read(STDIN,$in,$ENV{'CONTENT_LENGTH'});
+	}
+	@in = split(/&/,$in);
+	foreach $i (0 .. $#in) {
+		$in[$i] =~ s/\+/ /g;
+		($key, $val) = split(/=/,$in[$i],2);
+		$key =~ s/%(..)/pack("c",hex($1))/ge;
+		$val =~ s/%(..)/pack("c",hex($1))/ge;
+		$in{$key} .= "\0" if (defined($in{$key}));
+		$in{$key} .= $val;
+	}
+	return 1;
+}
+
+# round $num to $dec decimal places
+sub round {
+	my($num,$dec) = @_;
+	my($exp) = 10**$dec;
+	return(int($num*$exp+$exp/20)/$exp);
+}
+
+# make it look nicer
+sub formattedDate {
+	my($date) = @_;
+	($sec,$min,$hour,$mday,$mon,$year,$wday,$yday,$isdst) = localtime($date);
+	@months = ('Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec');
+	if ($year<100) {$year += 1900;}
+	$fdate = "$months[$mon] $mday, $year";
+	return $fdate;
+}
+
+#--end-----------------------------------------

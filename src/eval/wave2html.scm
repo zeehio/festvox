@@ -55,7 +55,7 @@
   -comment         experiment description
   -name            experiment name (one token)
   -o ofile         output file for html
-  -testtype        mos (default), ab, abx 
+  -testtype        mos (default), ab, abx, xabc
   -itype <string>  input type, data, abx or wav (default)
   -waveprefixdir <string>  Prefix for wavefiles (default \".\")
   -cgicript <string>   url to cgi script for loging results
@@ -254,6 +254,55 @@
 
 )
 
+(define (output_xabc_table fd waves)
+
+  (format fd "<h1>%s: %s</h1>\n" name comment)
+  (format fd "<hr>\n")
+  (format fd "<form name=\"evalform\" action=\"%s\" method=\"POST\">\n"
+	  cgiscript)
+  (format fd "Listener ID: <input type=text size=8 maxlength=8 name=\"listener_id\" value=awb\n<br>")
+  (format fd "Test name: <input type=text size=8 maxlength=8 name=\"test_name\" value=\"%s\">\n<br>" name)
+  (format fd "Identify which of speaker A, B, C or don't know is closest to X.\n<br>")
+  (format fd "<TABLE>\n")
+  (format fd "<th> <th> \n")
+  
+  (while waves
+     (set! wav_x (car (car waves)))
+     (set! wav_a (cadr (car waves)))
+     (set! wav_b (car (cddr (car waves))))
+     (set! wav_c (cadr (cddr (car waves))))
+     (set! waves (cdr waves))
+
+     (set! fname (format nil "%s_%s_%s_%s" wav_x wav_a wav_b wav_c))
+     (set! spaces "&nbsp;&nbsp;&nbsp;")
+     (format fd "<tr>\n")
+     (format fd "<td>\n")
+     (if (string-equal "." waveprefixdir)
+	 (format fd "<A HREF=\"%s.wav\">A</A>%s" wav_a)
+	 (format fd "<A HREF=\"%s/%s.wav\">A</A>%s" waveprefixdir wav_a spaces ))
+     (if (string-equal "." waveprefixdir)
+	 (format fd "<A HREF=\"%s.wav\">B</A>%s" wav_b)
+	 (format fd "<A HREF=\"%s/%s.wav\">B</A>%s" waveprefixdir wav_b spaces))
+     (if (string-equal "." waveprefixdir)
+	 (format fd "<A HREF=\"%s.wav\">C</A>%s" wav_c)
+	 (format fd "<A HREF=\"%s/%s.wav\">C</A>%s%s" waveprefixdir wav_c spaces spaces ))
+     (if (string-equal "." waveprefixdir)
+	 (format fd "<A HREF=\"%s.wav\">X</A>%s" wav_x spaces)
+	 (format fd "<A HREF=\"%s/%s.wav\">X</A>%s%s" waveprefixdir wav_x spaces spaces))
+
+     (format fd "<select size=1 name=\"%s\"><option>A<option>B<option>C<option>Don't know</select>" fname)
+     (format fd "<td>\n")
+     (format fd "<td>\n")
+     (format fd "</tr>\n")
+   )
+
+  (format fd "</TABLE>\n")
+  (format fd "<input type=submit value=\"DONE\">\n")
+  (format fd "</form>\n")
+  (format fd "<hr>\n")
+
+)
+
 (define (output_ab_table fd waves)
 
   (format fd "<h1>%s: %s</h1>\n" name comment)
@@ -323,6 +372,8 @@
    ((string-equal testtype "ab")
 ;    (output_ab_table ofd (load (car wave_files) t)))
     (output_ab_table ofd wave_files))
+   ((string-equal testtype "xabc")
+    (output_xabc_table ofd (load (car wave_files) t)))
    (t
     (if (string-equal itype "data")
 	(set! wave_files (load (car wave_files) t)))

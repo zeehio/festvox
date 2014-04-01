@@ -1,0 +1,101 @@
+#!/bin/sh
+###########################################################################
+##                                                                       ##
+##                   Carnegie Mellon University and                      ##
+##                   Alan W Black and Kevin A. Lenzo                     ##
+##                      Copyright (c) 1998-2000                          ##
+##                        All Rights Reserved.                           ##
+##                                                                       ##
+##  Permission is hereby granted, free of charge, to use and distribute  ##
+##  this software and its documentation without restriction, including   ##
+##  without limitation the rights to use, copy, modify, merge, publish,  ##
+##  distribute, sublicense, and/or sell copies of this work, and to      ##
+##  permit persons to whom this work is furnished to do so, subject to   ##
+##  the following conditions:                                            ##
+##   1. The code must retain the above copyright notice, this list of    ##
+##      conditions and the following disclaimer.                         ##
+##   2. Any modifications must be clearly marked as such.                ##
+##   3. Original authors' names are not deleted.                         ##
+##   4. The authors' names are not used to endorse or promote products   ##
+##      derived from this software without specific prior written        ##
+##      permission.                                                      ##
+##                                                                       ##
+##  CARNEGIE MELLON UNIVERSITY AND THE CONTRIBUTORS TO THIS WORK         ##
+##  DISCLAIM ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING      ##
+##  ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT   ##
+##  SHALL CARNEGIE MELLON UNIVERSITY NOR THE CONTRIBUTORS BE LIABLE      ##
+##  FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES    ##
+##  WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN   ##
+##  AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION,          ##
+##  ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF       ##
+##  THIS SOFTWARE.                                                       ##
+##                                                                       ##
+###########################################################################
+##                                                                       ##
+##  Regenerate the weather cache                                         ##
+##                                                                       ##
+##  This gets called every hour and regenerates the most frequently      ##
+##  requested weather reports over the past N requests                   ##
+##                                                                       ##
+###########################################################################
+
+FESTVOX=/usr2/festvox/www.festvox.org
+FESTIVAL=/usr2/festvox/www.festvox.org/bin/festival
+WEATHER_LOG=$FESTVOX/logs/gen_weather.log
+WEATHER_CACHE=$FESTVOX/ldom/weathercache
+WEATHER_LDOM_DIR=$FESTVOX/html/examples/cmu_weather_awb_ldom/
+GET_WEATHER=$WEATHER_LDOM_DIR/festvox/weather/bin/get_weather
+GET_ALL_WEATHER=$WEATHER_LDOM_DIR/festvox/weather/bin/get_all_weather
+
+# We will remove waveforms older than this once we've regenerated
+/bin/touch /tmp/mark_$$
+
+# Go and get new hourly updates
+$GET_ALL_WEATHER >/dev/null 2>&1
+
+# Will do last N when we have some people actually using it
+/bin/cat $WEATHER_LOG |
+/bin/awk 'BEGIN { freq["pa_\"pittsburgh\""] = 5;
+                  freq["or_\"portland\""] = 5;
+                  freq["ny_\"new_york_city\""] = 5;
+                  freq["ma_\"boston\""] = 5;
+                  freq["fl_\"miami\""] = 5;
+                  freq["ca_\"san_fran_city\""] = 5; }
+      {if ($0 ~ /[0-9][0-9]?[0-9]?\.[0-9][0-9]?[0-9]?\.[0-9][0-9]?[0-9]?\.[0-9][0-9]?[0-9]?/)
+      {
+         getline
+         state=$0
+         getline
+         city=$0;
+         sc = sprintf("%s \"%s\"",state,city);
+         gsub(" ","_",sc);
+         freq[sc] += 1;
+      }
+     }
+     END { for (sc in freq)
+           {
+              printf("%d %s\n",freq[sc],sc);
+           }
+     }' | /bin/sort -nr | /usr/bin/head -200 |
+/bin/awk '{if ($1 > 1) 
+           { 
+             gsub("_"," ",$2); 
+             fname=$2;
+             sub(" ",".",fname); 
+             gsub("\"","",fname); 
+             gsub(" ","_",fname); 
+             printf("(save_weather '"'"'%s \"%s/%s.wav\")\n",
+                    $2,"'$WEATHER_CACHE'2",fname);
+           }
+          }' |
+$FESTIVAL "(voice_weather_ldom)" >/dev/null
+/bin/mv -f $WEATHER_CACHE"2"/*.wav $WEATHER_CACHE
+/usr/bin/find $WEATHER_CACHE -not -newer /tmp/mark_$$ -exec rm -f {} \;
+
+rm -r /tmp/mark_$$
+
+
+
+
+
+

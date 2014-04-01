@@ -16,18 +16,31 @@ system for that matter) are still nowhere near perfect quality.
 This distribution includes
     Support for designing, recording and autolabelling diphone databases
     Support for designing, recording and autolabelling unit selection dbs
+    Support for designing, recording and autolabelling statistical parametric
+        synthesis voices
     Building simple limited domain synthesis engines
     Support for building rule driven and data driven prosody models
        (duration, intonation and phrasing)
     Support for building rule driven and data driven text analysis
     Lexicon and building Letter to Sound rule support
     Predefined scripts for building new US (and UK) English voices
+    Scripts for designing and selecting prompts to record in
+       arbitrary languages
 
-New in 2.1
-    Voice transformation support
-    An HMM-based labeling system (better tuned for labeling synthesis dbs)
-    Letter to sound rule build code and examples
-    F0 unit selection for F0 modeling
+New in 2.6
+
+    Grapheme based synthesizers (with specific support for large number
+      of unicode writing systems)
+    Clustergen state and stop value optimization
+    Wavesurfer label support
+    SPAM F0 support
+    Phrase break support
+    Support for SPTK's mgc parameterization
+
+New in 2.3
+    
+    Support for cygwin tools under Windows
+    Substantially improved CLUSTERGEN support with mlpg and mlsb
 
 WARNING
 
@@ -56,15 +69,8 @@ Festival and Speech Tools
     It is recommended that you compile your own versions of these
     as you will need the libraries and include files to build some
     programs in this festvox.
-EMU Labeller
-    The University of Macquarie's Speech Hearing and Language Research
-    Centre distribute labelling tools for speech databases.  We use
-    it here for viewing speech, as spectrograms, F0s phone labels etc.
-    It is available from 
-           http://www.shlrc.mq.edu.au/emu/
-    Other waveform labeller/viewers exist and you find them more convinient
-    to use but we include support for emulabel as it meets our requirements
-    and is freely available.
+Wavesurfer
+    TO display wavesforms, spectragrams and phoneme labels.
 Patience and understanding
     Building a new voice is a lot of work, and something will probably
     go wrong which may require the repetition of some long boring and
@@ -79,9 +85,9 @@ INSTALLATION
 You must have the Edinburgh Speech Tools and Festival instllation
 before you can build the tools in the festvox distribution.
 
-Unpack festvox-2.1-release.tar.gz
+Unpack festvox-2.6-release.tar.gz
 
-    tar zxvf festvox-2.1-release.tar.gz
+    tar zxvf festvox-2.6-release.tar.gz
     cd festvox
     ./configure
     make
@@ -111,12 +117,12 @@ To use the scripts and programs in the festvox distribution each
 user is expected to have the environment variables ESTDIR and
 FESTVOXDIR set for example as (if you use bash, zsh, ksh or sh)
 
-   export ESTDIR=/home/awb/projects/1.4.3/speech_tools
+   export ESTDIR=/home/awb/projects/speech_tools
    export FESTVOXDIR=/home/awb/projects/festvox
 
 Or if you use csh or tcsh
 
-   setenv ESTDIR /home/awb/projects/1.4.3/speech_tools
+   setenv ESTDIR /home/awb/projects/speech_tools
    setenv FESTVOXDIR /home/awb/projects/festvox
 
 Remember to set these to where *your* installations are, not *ours*.

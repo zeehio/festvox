@@ -2,7 +2,7 @@
 ##                                                                       ##
 ##                   Carnegie Mellon University and                      ##
 ##                   Alan W Black and Kevin A. Lenzo                     ##
-##                      Copyright (c) 1998-2003                          ##
+##                      Copyright (c) 1998-2013                          ##
 ##                        All Rights Reserved.                           ##
 ##                                                                       ##
 ##  Permission is hereby granted, free of charge, to use and distribute  ##
@@ -33,7 +33,7 @@
 ##                                                                       ##
 ##  Authors: Alan W Black (awb@cs.cmu.edu)                               ##
 ##           Kevin A. Lenzo (lenzo@cs.cmu.edu)                           ##
-##  Version: festvox-2.0 December 2002                                   ##
+##  Version: festvox-2.6 January 2013                                    ##
 ##                                                                       ##
 ###########################################################################
 ##                                                                       ##
@@ -42,8 +42,8 @@
 ##                                                                       ##
 ##  This project's home page is http://www.festvox.org                   ##
 ##                                                                       ##
-##  This release corresponds to the Festival 1.4.3 release (which        ##
-##  incorporates Edinburgh Speech Tools 1.2.3)                           ##
+##  This release corresponds to the Festival 2.1 release (which          ##
+##  incorporates Edinburgh Speech Tools 2.1)                             ##
 ##                                                                       ##
 ###########################################################################
 TOP=.
@@ -52,7 +52,7 @@ BUILD_DIRS = src
 ALL_DIRS=config docbook festvox.org $(BUILD_DIRS)
 CONFIG=configure configure.in config.sub config.guess \
        missing install-sh mkinstalldirs
-OTHERS = README ACKNOWLEDGEMENTS ANNOUNCE-1.1 ANNOUNCE-1.2 ANNOUNCE-2.0
+OTHERS = README ACKNOWLEDGEMENTS 
 FILES = Makefile $(OTHERS) $(CONFIG)
 
 ALL = $(BUILD_DIRS)

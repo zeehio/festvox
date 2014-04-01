@@ -82,7 +82,7 @@ int main(int argc,char **argv)
     find_meanstd(ss,files);
 
     printf("Applying stats\n");
-    for (p=files.head(); p != 0; p=next(p))
+    for (p=files.head(); p != 0; p=p->next())
     {
 	tt.load(files(p));
 	printf("%s\n",(const char *)files(p));
@@ -121,7 +121,7 @@ static void find_meanstd(EST_Track &ss, EST_StrList &files)
     for (i=0; i< num_phones; i++)
 	sstable[i] = new EST_SuffStats[tt.num_channels()];
     
-    for (p=files.head(); p != 0; p=next(p))
+    for (p=files.head(); p != 0; p=p->next())
     {
 	tt.load(files(p));
 	lll = EST_String("lab/")+basename(files(p)).before(".")+".lab";
@@ -143,9 +143,9 @@ static void find_meanstd(EST_Track &ss, EST_StrList &files)
 		    v = 100;
 		sstable[phoneid][j] += v;
 	    }
-	    if (s && next(s) && (s->F("end") < tt.t(i)))
+	    if (s && next_item(s) && (s->F("end") < tt.t(i)))
 	    {
-		s = next(s);
+		s = next_item(s);
 		phoneid = get_phone_id(s->S("name"));
 /*		printf("%s\n",phonetab[phoneid]); */
 	    }
@@ -205,9 +205,9 @@ static void cep_normalize(EST_Track &tt, const EST_Track &ss, EST_Relation &rr)
 //	    else if (tt.a_no_check(i,j) < -50)
 //		tt.a_no_check(i,j) = -50;
 	}
-	while (s && next(s) && (s->F("end") < tt.t(i)))
+	while (s && next_item(s) && (s->F("end") < tt.t(i)))
 	{
-	    s = next(s);
+	    s = next_item(s);
 	    phoneid = get_phone_id(s->S("name"));
 	}
     }

@@ -35,6 +35,8 @@
 ##                                                                       ##
 ###########################################################################
 
+LANG=C; export LANG
+
 DATAFILE=$1
 
 if [ $# != 1 ]
@@ -47,6 +49,7 @@ awk '{print $2}' $DATAFILE |
 while read i
 do
    awk '{print $1}' festival/coeffs/$i.feats
+   rm -f festival/coeffs/$i.feats
 done | 
 sort -u |
 while read x
@@ -59,6 +62,7 @@ do
          printf("\n");}' >festival/feats/$x.feats
    awk '{print $1,$2}' festival/feats/$x.feats-old |
    $ESTDIR/bin/ch_track -itype ascii -otype est_binary -s 0.005 -o festival/disttabs/$x.idx
+   rm festival/feats/$x.feats-old 
 
 done
 

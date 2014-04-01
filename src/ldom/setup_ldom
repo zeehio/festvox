@@ -125,7 +125,7 @@ cp -p $FESTVOXDIR/src/st/build_st.scm festvox
 echo Copying domain specific parameters
 if [ -f $FESTVOXDIR/src/vox_files/prompts/$FV_LDOM.data ]
 then
-    cp -p $FESTVOXDIR/src/vox_files/prompts/$FV_LDOM.data etc/
+    cp -p $FESTVOXDIR/src/vox_files/prompts/$FV_LDOM.data etc/txt.done.data
 else
     echo "***"
     echo "*** Unknown domain \""$FV_LDOM"\" you must create "etc/$FV_LDOM.data" yourself"

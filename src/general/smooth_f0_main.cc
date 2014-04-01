@@ -53,7 +53,7 @@ static void interpolate(const EST_Track &c,
 			const EST_Track &speech,
 			EST_Track &interp);
 static void pm_to_f0(const EST_Track &pm, EST_Track &f0, 
-		     int minf0, float shift);
+		     float minf0, float shift);
 
 int main(int argc,char **argv)
 {
@@ -75,7 +75,7 @@ int main(int argc,char **argv)
 	 "-pm_input\n"+
          "     Input is from (non-filled) pitchmark file rather than\n"+
          "     an F0 file.\n"+
-         "-pm_min_f0 <int> {110}\n"+
+         "-pm_min_f0 <float> {110.0}\n"+
          "     If pm_input is used, this defined when pm distances are to\n"+
          "     treated as unvoiced regions\n"+
          "-pm_f0_shift <float> {0.005}\n"+
@@ -107,7 +107,7 @@ int main(int argc,char **argv)
 	if (read_track(pm_in, files.first(), al) != format_ok)
 	    exit(-1);
 	pm_to_f0(pm_in,f0_in,
-		 al.ival("-pm_min_f0"),
+		 al.fval("-pm_min_f0"),
 		 al.fval("-pm_f0_shift"));
     }
     else if (read_track(f0_in, files.first(), al) != format_ok)
@@ -300,7 +300,7 @@ static void interpolate(const EST_Track &c,
 }
 
 static void pm_to_f0(const EST_Track &pm, EST_Track &f0, 
-		     int minf0, float shift)
+		     float minf0, float shift)
 {
     // Converts a pm to a fixed framed F0 track.
     int i,pm_pos;
@@ -311,7 +311,7 @@ static void pm_to_f0(const EST_Track &pm, EST_Track &f0,
     f0.set_channel_name("prob_voice",1);
     f0.fill_time(shift);
     f0.set_equal_space(TRUE);
-    maxshift = 1.0 / (float)minf0;
+    maxshift = 1.0 / minf0;
 
     for (i=0; i < f0.num_frames(); i++)
     {

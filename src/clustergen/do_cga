@@ -36,6 +36,8 @@
 ##                                                                       ##
 ###########################################################################
 
+LANG=C; export LANG
+
 if [ ! "$ESTDIR" ]
 then
    echo "environment variable ESTDIR is unset"
@@ -99,12 +101,14 @@ then
        mkdir cga/target/lab
        mkdir cga/target/f0
        mkdir cga/target/mcep
+       mkdir cga/target/mcep_deltas
        mkdir cga/source
        mkdir cga/source/etc
        mkdir cga/source/utt
        mkdir cga/source/wav
        mkdir cga/source/ccoefs
        mkdir cga/source/mcep
+       mkdir cga/source/mcep_deltas
        mkdir cga/source/lab
        mkdir cga/source/f0
     fi
@@ -115,8 +119,36 @@ fi
 
 if [ $1 = "build_source_files" ]
 then
+   ORDER=24
+   dynwin=$FESTVOXDIR/src/vc/src/win/dyn.win
+   CG_TMP=cg_tmp_$$
+
     # build cga/source/coeff
     $ESTDIR/../festival/bin/festival -b festvox/${FV_VOICENAME}_cg.scm '(voice_'${FV_VOICENAME}'_cg)' $CLUSTERGENDIR/clustergen_build.scm '(build_cga_source_files "'$PROMPTFILE'")'
+
+    exit 0
+    cd cga/source;
+    ../../bin/make_voicing pda ../../$PROMPTFILE
+
+   cat ../../$PROMPTFILE |
+   awk '{print $2}' |
+   while read i
+   do
+      fname=$i
+      echo $fname adding the deltas
+
+      ORDERP=`echo $ORDER | awk '{printf("%d",$1+1)}'`
+      $FESTVOXDIR/src/vc/src/mlpg/delta -nmsg -jnt -dynwinf $dynwin -dim $ORDERP mcep/$fname.mcep $CG_TMP.mcepd
+
+      cat $CG_TMP.mcepd |
+      perl $CLUSTERGENDIR/d2a.pl |
+      awk '{printf("%s ",$1); if ((NR%(2*('$ORDER'+1))) == 0) printf("\n")}' |
+      cat >$CG_TMP.ascii.mcepd
+
+      cat $CG_TMP.ascii.mcepd |
+      $ESTDIR/bin/ch_track -itype ascii -otype est_binary -s 0.005 -o mcep_deltas/$i.mcep
+      rm -f $CG_TMP.*
+    done
 
     exit 0
 fi
@@ -130,13 +162,14 @@ then
     ../../bin/find_f0_stats ../../$PROMPTFILE
 
     export PROMPTFILE=../../$PROMPTFILE
-    ../../bin/do_clustergen mcep 
+    ../../bin/do_clustergen mcep_static
+#    ../../bin/make_voicing pda
 
     cat $PROMPTFILE | awk '{print $2}' |
     while read fname
     do
        # F0 isn't actually used here yet, but we need something
-       $ESTDIR/bin/ch_track -c 0 mcep/$fname.mcep |
+       $ESTDIR/bin/ch_track -c 0 mcep_static/$fname.mcep |
        awk '{print 0.0}' |
        $ESTDIR/bin/ch_track -o f0/$fname.f0 -itype ascii -otype est_binary -s 0.005
     done

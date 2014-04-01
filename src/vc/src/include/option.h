@@ -68,16 +68,16 @@
 #define bool2str(value) ((*(XBOOL *)(value) == XTRUE) ? "True" : "False")
 
 typedef struct ARGFILE_STRUCT {
-    char *label;	/* label for help message */
+    const char *label;	/* label for help message */
     char *name;		/* filename */
 } ARGFILE, *ARGFILE_P;
 
 typedef struct OPTION_STRUCT {
-    char *flag;		/* option flag */
-    char *subflag;	/* option subflag */
-    char *desc;		/* description for help */
-    char *label;	/* label for setup file */
-    char *specifier;	/* specifier for using X11 */
+    const char *flag;		/* option flag */
+    const char *subflag;	/* option subflag */
+    const char *desc;		/* description for help */
+    const char *label;	/* label for setup file */
+    const char *specifier;	/* specifier for using X11 */
     int type;		/* type of value */
     void *value;	/* option value */
     XBOOL changed;	/* true if value changed */
@@ -92,10 +92,10 @@ typedef struct OPTIONS_STRUCT {
     ARGFILE *file;	/* file structure */
 } OPTIONS, *OPTIONS_P;
 
-extern char *getbasicname(char *name);
-extern char *xgetbasicname(char *name);
-extern char *xgetdirname(char *name);
-extern char *xgetexactname(char *name);
+extern const char *getbasicname(const char *name);
+extern char *xgetbasicname(const char *name);
+extern char *xgetdirname(const char *name);
+extern char *xgetexactname(const char *name);
 extern int flageq(char *flag, OPTIONS options);
 extern int convoptvalue(char *value, OPTION *option);
 extern int setoptvalue(char *value, OPTION *option);
@@ -106,8 +106,8 @@ extern int getargfile(char *filename, int *fc, OPTIONS *options);
 extern void printhelp();
 extern void printerr();
 #else
-extern void printhelp(OPTIONS options, char *format, ...);
-extern void printerr(OPTIONS options, char *format, ...);
+extern void printhelp(OPTIONS options, const char *format, ...);
+extern void printerr(OPTIONS options, const char *format, ...);
 #endif
 extern int labeleq(char *label, OPTIONS *options);
 extern void readsetup(char *filename, OPTIONS *options);

@@ -16,7 +16,7 @@ models the original speaker well.
 
 </para><para>
 
-Although this method is partially "tagged on" to the clunits method,
+Although this method is partially "tagged on to" the clunits method,
 it is actually quite independent.  The tasks are as follows.
 
 <itemizedlist mark=bullet>
@@ -37,7 +37,7 @@ Label the data with the HMM-state sized segments
 Build utterance structures for recorded utterances
 </para></listitem>
 <listitem><para>
-Extract F0 and mcep coefficients.
+Extract F0, voicing and mcep coefficients.
 </para></listitem>
 <listitem><para>
 Build a CLUSTERGEN voice
@@ -64,8 +64,8 @@ First make an empty directory and in it run the
     $FESTVOXDIR/src/clustergen/setup_cg cmu us awb_arctic
 </literallayout></blockquote>
 In you already have an existing voice running
-<filename>setup_cg</filename> while only copy in the necessary files
-for clustergen, however I'd recommend starting from scratch as I don't
+<filename>setup_cg</filename> will only copy in the necessary files
+for clustergen, however I recommend starting from scratch as I don't
 know when you created your previous voice and I'm not sure of its
 exact state.
 
@@ -80,7 +80,36 @@ they get power normalized and get changed to a reasonable format
 
 </para><para>
 
-The next stage if to label the data.  If you aren't
+In you are going to record them in your current directory, you should
+call 
+<blockquote><literallayout>
+    ./bin/do_build build_prompts_waves
+</literallayout></blockquote>
+first to generate example waveforms, then use
+<blockquote><literallayout>
+    ./bin/prompt_them etc/txt.done.data 1
+</literallayout></blockquote>
+
+To prompt you and record the prompts.  You <emphasis>must</emphasis> check
+that the recording actually works.  It should generate recordings in
+the <filename>wav/</filename>.  You can
+use <filename>$ESTDIR/bin/na_play</filename> to play the waveform
+files.  <filename>prompt_them</filename> can be stopped with ctrl-c
+and restarted at the line number given as the second argument.
+
+</para><para>
+
+If you have collected the waveform files by some other process you do
+not need to generate the prompt waveform files thus you just use
+<blockquote><literallayout>
+    ./bin/do_build build_prompts
+</literallayout></blockquote>
+which will generate the prompt utterances (which are used to find the
+expected phones), but more the prompt waveforms.
+
+</para><para>
+
+The next stage is to label the data.  If you aren't
 <emphasis>very</emphasis> knowledgeable about labeling in clustergen, you
 should use the EHMM labeler.  EHMM constructs the labels in the right
 format for segments and HMM states. and matches them properly with
@@ -111,7 +140,8 @@ into a single parameter file for each utterance in the database.
 <blockquote><literallayout>
     ./bin/do_clustergen f0
     ./bin/do_clustergen mcep
-    ./bin/do_clustergen combine_coeffs
+    ./bin/do_clustergen voicing
+    ./bin/do_clustergen combine_coeffs_v
 </literallayout></blockquote>
 
 The mcep part takes the longest.  Note that the F0 part now tries to
@@ -158,7 +188,7 @@ The resulting voice should now work
 </para><para>
 The voice can be packaged for distribution by the command
 <blockquote><literallayout>
-   ./bin/do_clusterget festvox_dist
+   ./bin/do_clustergen festvox_dist
 </literallayout></blockquote>
 
 This will generation
@@ -196,6 +226,7 @@ You can run
 <blockquote><literallayout>
    $FESTVOXDIR/src/clustergen/cg_test resynth cgp
 </literallayout></blockquote>
+NOTE: This no longer works automatically, as you need static mceps and ccoefs for this to work.
 
 This will create parameter files (and waveform files) in
 <filename>test/cgp</filename>.  The output of the

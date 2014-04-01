@@ -63,11 +63,11 @@ R:segstate.parent.R:SylStructure.parent.R:Syllable.p.accented
 R:segstate.parent.R:SylStructure.parent.accented
 R:segstate.parent.R:SylStructure.parent.R:Syllable.n.accented
 R:segstate.parent.R:SylStructure.parent.R:Syllable.nn.accented
-R:segstate.parent.R:SylStructure.parent.R:Syllable.pp.syl_break
-R:segstate.parent.R:SylStructure.parent.R:Syllable.p.syl_break
-R:segstate.parent.R:SylStructure.parent.syl_break
-R:segstate.parent.R:SylStructure.parent.R:Syllable.n.syl_break
-R:segstate.parent.R:SylStructure.parent.R:Syllable.nn.syl_break
+R:segstate.parent.R:SylStructure.parent.R:Syllable.pp.lisp_cg_break
+R:segstate.parent.R:SylStructure.parent.R:Syllable.p.lisp_cg_break
+R:segstate.parent.R:SylStructure.parent.lisp_cg_break
+R:segstate.parent.R:SylStructure.parent.R:Syllable.n.lisp_cg_break
+R:segstate.parent.R:SylStructure.parent.R:Syllable.nn.lisp_cg_break
 R:segstate.parent.R:SylStructure.parent.R:Syllable.pp.stress 
 R:segstate.parent.R:SylStructure.parent.R:Syllable.p.stress 
 R:segstate.parent.R:SylStructure.parent.stress 

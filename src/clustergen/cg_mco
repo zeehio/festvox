@@ -67,7 +67,11 @@
 ##  An earlier version was set up to generically run wagon on some set   ##
 ##  set of data (called wagon_cv)                                        ##
 ##                                                                       ##
+##  Cute but doesn't seem very helpful ...                               ##
+##                                                                       ##
 ###########################################################################
+
+LANG=C; export LANG
 
 if [ ! "$ESTDIR" ]
 then
@@ -123,29 +127,27 @@ do
         function randint(n) { return int(n * rand()) }
         {
            p = randint(100);
-           if (p < 33)
+           if (p < 50)
               print "TRAIN",$0
-           else if (p < 66)
-              print "IGNORE",$0
+#           else if (p < 66)
+#              print "IGNORE",$0
            else
               print "TEST",$0
         }
         END { printf("SEED %02d%02d",randint(100),randint(100))}' >$DATASET.split
    grep "^TRAIN" $DATASET.split | sed 's/^TRAIN //' >$DATASET.train
    grep "^TEST" $DATASET.split | sed 's/^TEST //' >$DATASET.test
-   grep "^IGNORE" $DATASET.split | sed 's/^IGNORE //' >$DATASET.ignore
+#   grep "^IGNORE" $DATASET.split | sed 's/^IGNORE //' >$DATASET.ignore
    SEED=`grep "^SEED" $DATASET.split | awk '{print $2}'`
 
    # Use the TRAIN set to build a model
-   export PROMPTFILE=$DATASET.train
-   ./bin/do_clustergen cluster
+   ./bin/do_clustergen cluster $DATASET.train
    # test on the TEST set
-   export PROMPTFILE=$DATASET
-   SCORE=`$FESTVOXDIR/src/clustergen/cg_test resynth cv | grep MCD | awk '{print $3}'`
+   SCORE=`$FESTVOXDIR/src/clustergen/cg_test mcdf0 cv $DATASET.test | grep MCD | awk '{print $3}'`
 
    # Save the scores
-   cat $DATASET.ignore | 
-   awk '{printf("%s %f %d\n",$2,20.0-'$SCORE','$x')}' >>$DATASET.scores
+#   cat $DATASET.ignore | 
+#   awk '{printf("%s %f %d\n",$2,20.0-'$SCORE','$x')}' >>$DATASET.scores
    cat $DATASET.train | 
    awk '{printf("%s %f %d\n",$2,'$SCORE','$x')}' >>$DATASET.scores
 

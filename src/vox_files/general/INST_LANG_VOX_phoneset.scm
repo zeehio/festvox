@@ -46,7 +46,8 @@
   INST_LANG
   ;;;  Phone Features
   (;; vowel or consonant
-   (vc + -)  
+   (clst + - 0)
+   (vc + - 0)
    ;; vowel length: short long dipthong schwa
    (vlng s l d a 0)
    ;; vowel height: high mid low
@@ -55,16 +56,18 @@
    (vfront 1 2 3 0 -)
    ;; lip rounding
    (vrnd + - 0)
-   ;; consonant type: stop fricative affricative nasal liquid
-   (ctype s f a n l 0)
-   ;; place of articulation: labial alveolar palatal labio-dental
-   ;;                         dental velar
-   (cplace l a p b d v 0)
+   ;; consonant type: stop fricative affricative nasal liquid approximant
+   (ctype s f a n l r 0)
+   ;; place of articulation: labial alveolar palatal
+   ;; labio-dental dental velar glottal
+   (cplace l a p b d v g 0)
    ;; consonant voicing
    (cvox + - 0)
+   (asp  + - 0)
+   (nuk + - 0)
    )
   (
-   (pau  - 0 - - - 0 0 -)  ;; slience ... 
+   (    pau   -   -   0   0   0   0   0   0   -   -   -   ) 
 
    ;; insert the phones here, see examples in 
    ;; festival/lib/*_phones.scm

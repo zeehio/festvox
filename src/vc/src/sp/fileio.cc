@@ -64,7 +64,7 @@
 /*
  *	get file size
  */
-long getfilesize(char *filename, int headlen)
+long getfilesize(const char *filename, int headlen)
 {
     long size;
     char *basicname;
@@ -393,7 +393,7 @@ void fwritedoubletos(double *data, long length, int swap, FILE *fp)
 /*
  *	read short signal
  */
-SVECTOR xreadssignal(char *filename, int headlen, int swap)
+SVECTOR xreadssignal(const char *filename, int headlen, int swap)
 {
     long length;
     char *basicname;
@@ -441,7 +441,7 @@ SVECTOR xreadssignal(char *filename, int headlen, int swap)
 /*
  *	read float signal
  */
-FVECTOR xreadfsignal(char *filename, int headlen, int swap)
+FVECTOR xreadfsignal(const char *filename, int headlen, int swap)
 {
     long length;
     char *basicname;
@@ -486,7 +486,7 @@ FVECTOR xreadfsignal(char *filename, int headlen, int swap)
     return vector;
 }
 
-DVECTOR xdvreadssignal(char *filename, int headlen, int swap)
+DVECTOR xdvreadssignal(const char *filename, int headlen, int swap)
 {
     long length;
     char *basicname;
@@ -534,7 +534,7 @@ DVECTOR xdvreadssignal(char *filename, int headlen, int swap)
 /*
  *	read double signal
  */
-DVECTOR xreaddsignal(char *filename, int headlen, int swap)
+DVECTOR xreaddsignal(const char *filename, int headlen, int swap)
 {
     long length;
     char *basicname;
@@ -579,7 +579,7 @@ DVECTOR xreaddsignal(char *filename, int headlen, int swap)
     return vector;
 }
 
-DVECTOR xreadf2dsignal(char *filename, int headlen, int swap)
+DVECTOR xreadf2dsignal(const char *filename, int headlen, int swap)
 {
     long length, k;
     char *basicname;
@@ -633,7 +633,7 @@ DVECTOR xreadf2dsignal(char *filename, int headlen, int swap)
 /*
  *	write short signal
  */
-void writessignal(char *filename, SVECTOR vector, int swap)
+void writessignal(const char *filename, SVECTOR vector, int swap)
 {
     char *basicname;
     FILE *fp;
@@ -665,7 +665,7 @@ void writessignal(char *filename, SVECTOR vector, int swap)
     return;
 }
 
-void dvwritessignal(char *filename, DVECTOR vector, int swap)
+void dvwritessignal(const char *filename, DVECTOR vector, int swap)
 {
     char *basicname;
     FILE *fp;
@@ -700,7 +700,7 @@ void dvwritessignal(char *filename, DVECTOR vector, int swap)
 /*
  *	write double signal
  */
-void writedsignal(char *filename, DVECTOR vector, int swap)
+void writedsignal(const char *filename, DVECTOR vector, int swap)
 {
     char *basicname;
     FILE *fp;
@@ -732,7 +732,7 @@ void writedsignal(char *filename, DVECTOR vector, int swap)
     return;
 }
 
-void writed2fsignal(char *filename, DVECTOR vector, int swap)
+void writed2fsignal(const char *filename, DVECTOR vector, int swap)
 {
     long k;
     char *basicname;
@@ -773,7 +773,7 @@ void writed2fsignal(char *filename, DVECTOR vector, int swap)
 #if 0
 #endif
 
-LMATRIX xreadlmatrix(char *filename, long ncol, int swap)
+LMATRIX xreadlmatrix(const char *filename, long ncol, int swap)
 {
     long k;
     long nrow;
@@ -823,7 +823,7 @@ LMATRIX xreadlmatrix(char *filename, long ncol, int swap)
     return mat;
 }
 
-DMATRIX xreaddmatrix(char *filename, long ncol, int swap)
+DMATRIX xreaddmatrix(const char *filename, long ncol, int swap)
 {
     long k;
     long nrow;
@@ -873,7 +873,7 @@ DMATRIX xreaddmatrix(char *filename, long ncol, int swap)
     return mat;
 }
 
-DMATRIX xreadf2dmatrix(char *filename, long ncol, int swap)
+DMATRIX xreadf2dmatrix(const char *filename, long ncol, int swap)
 {
     long k, l;
     long nrow;
@@ -927,7 +927,7 @@ DMATRIX xreadf2dmatrix(char *filename, long ncol, int swap)
     return mat;
 }
 
-void writelmatrix(char *filename, LMATRIX mat, int swap)
+void writelmatrix(const char *filename, LMATRIX mat, int swap)
 {
     long k;
     char *basicname;
@@ -962,7 +962,7 @@ void writelmatrix(char *filename, LMATRIX mat, int swap)
     return;
 }
 
-void writedmatrix(char *filename, DMATRIX mat, int swap)
+void writedmatrix(const char *filename, DMATRIX mat, int swap)
 {
     long k;
     char *basicname;
@@ -997,7 +997,7 @@ void writedmatrix(char *filename, DMATRIX mat, int swap)
     return;
 }
 
-void writed2fmatrix(char *filename, DMATRIX mat, int swap)
+void writed2fmatrix(const char *filename, DMATRIX mat, int swap)
 {
     long k, l;
     float *fdata = NULL;
@@ -1040,7 +1040,7 @@ void writed2fmatrix(char *filename, DMATRIX mat, int swap)
 /*
  *	file i/o for text data
  */
-long getfilesize_txt(char *filename)
+long getfilesize_txt(const char *filename)
 {
     long size;
     double value;
@@ -1066,7 +1066,7 @@ long getfilesize_txt(char *filename)
     return size;
 }
 
-int readdvector_txt(char *filename, DVECTOR vector)
+int readdvector_txt(const char *filename, DVECTOR vector)
 {
     long lc;
     double value;
@@ -1101,7 +1101,7 @@ int readdvector_txt(char *filename, DVECTOR vector)
     return SUCCESS;
 }
 
-DVECTOR xreaddvector_txt(char *filename)
+DVECTOR xreaddvector_txt(const char *filename)
 {
     long length;
     DVECTOR vector;
@@ -1120,7 +1120,7 @@ DVECTOR xreaddvector_txt(char *filename)
     return vector;
 }
 
-int getnumrow_txt(char *filename)
+int getnumrow_txt(const char *filename)
 {
     int nrow, ncol;
     FILE *fp;
@@ -1145,7 +1145,7 @@ int getnumrow_txt(char *filename)
     return nrow;
 }
 
-int getnumcol_txt(char *filename)
+int getnumcol_txt(const char *filename)
 {
     int ncol;
     FILE *fp;
@@ -1574,7 +1574,7 @@ int sscanf_setup(char *line, char *name, char *value)
     return ncol;
 }
 
-int dvreadcol_txt(char *filename, int col, DVECTOR vector)
+int dvreadcol_txt(const char *filename, int col, DVECTOR vector)
 {
     long k;
     char buf[MAX_LINE];
@@ -1595,7 +1595,7 @@ int dvreadcol_txt(char *filename, int col, DVECTOR vector)
     return SUCCESS;
 }
 
-DVECTOR xdvreadcol_txt(char *filename, int col)
+DVECTOR xdvreadcol_txt(const char *filename, int col)
 {
     long length;
     DVECTOR vector;
@@ -1612,7 +1612,7 @@ DVECTOR xdvreadcol_txt(char *filename, int col)
     return vector;
 }
 
-int writedvector_txt(char *filename, DVECTOR vector)
+int writedvector_txt(const char *filename, DVECTOR vector)
 {
     long lc;
     char *basicname;
@@ -1942,7 +1942,7 @@ void dvnfdump(FILE *fp, DVECTOR vec, ...)
 #endif
 
 
-void check_dir(char *file)
+void check_dir(const char *file)
 {
     int k, len;
     char dir[MAX_LINE] = "";
@@ -1965,7 +1965,7 @@ void check_dir(char *file)
 }
 
 
-long get_dnum_file(char *file, long dim)
+long get_dnum_file(const char *file, long dim)
 {
     long length, dnum;
 
@@ -1982,7 +1982,7 @@ long get_dnum_file(char *file, long dim)
     return dnum;
 }
 
-long get_fnum_file(char *file, long dim)
+long get_fnum_file(const char *file, long dim)
 {
     long length, fnum;
 
@@ -1999,7 +1999,7 @@ long get_fnum_file(char *file, long dim)
     return fnum;
 }
 
-long get_lnum_file(char *file, long dim)
+long get_lnum_file(const char *file, long dim)
 {
     long length, fnum;
 

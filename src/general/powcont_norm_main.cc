@@ -71,7 +71,7 @@ int main(int argc,char **argv)
     {
 	maxthres = al.fval("-max");
 	for (powerpoint = powcont.head(); powerpoint; 
-	     powerpoint = next(powerpoint))
+	     powerpoint = next_item(powerpoint))
 	{
 	    if (fabs(powerpoint->F("name")) > maxthres)
 		powerpoint->set("name",maxthres);
@@ -98,7 +98,7 @@ int main(int argc,char **argv)
 //	       factor,increment,end_sample,i);
 	if (i == end_sample)
 	{
-	    powerpoint = next(powerpoint);
+	    powerpoint = next_item(powerpoint);
 	    if (powerpoint == 0)
 		break;
 	    start_sample = end_sample;

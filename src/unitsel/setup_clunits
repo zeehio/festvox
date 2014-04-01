@@ -116,13 +116,18 @@ cp -p $FESTVOXDIR/src/general/contour_powernormalize bin
 cp -p $FESTVOXDIR/src/general/make_dist bin
 cp -p $FESTVOXDIR/src/general/make_cmn bin
 cp -p $FESTVOXDIR/src/general/traintest bin
+cp -p $FESTVOXDIR/src/general/find_num_available_cpu bin
 cp -p $FESTVOXDIR/src/general/emu_lab.tpl etc/emu_lab.tpl
 cp -p $FESTVOXDIR/src/general/emu_pm.tpl etc/emu_pm.tpl
 cp -p $FESTVOXDIR/src/general/emu_f0.tpl etc/emu_f0.tpl
 cp -p $FESTVOXDIR/src/general/emu_hier.tpl etc/emu_hier.tpl
+cp -p $FESTVOXDIR/src/general/ws bin/ws
+cp -p $FESTVOXDIR/src/general/ws_festvox.conf etc/ws_festvox.conf
 cp -p $FESTVOXDIR/src/general/make_samples bin
 cp -p $FESTVOXDIR/src/general/reduce_prompts bin
 cp -p $FESTVOXDIR/src/general/synthfile bin
+cp -p $FESTVOXDIR/src/general/find_db_duration bin
+cp -p $FESTVOXDIR/src/general/prune_silence bin
 cp -p $FESTVOXDIR/src/st/sphinxtrain bin
 cp -p $FESTVOXDIR/src/st/sphinx_lab bin
 cp -p $FESTVOXDIR/src/st/build_st.scm festvox
@@ -181,6 +186,14 @@ do
    sed 's%VOX%'$FV_VOX'%g' |
    sed 's%CURRENTDIR%'"$CURRENTDIR"'%g' >festvox/$fname
 done
+
+if [ -f $FESTVOXTEMPLATEDIR/$FV_LANG_SKELS/other_files ]
+then
+   for i in `cat $FESTVOXTEMPLATEDIR/$FV_LANG_SKELS/other_files`
+   do
+      cp -p $FESTVOXTEMPLATEDIR/$FV_LANG_SKELS/$i festvox
+   done
+fi
 
 echo "Set up for "$FV_INST"_"$FV_LANG"_"$FV_VOX" complete"
 

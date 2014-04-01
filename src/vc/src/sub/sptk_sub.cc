@@ -334,7 +334,7 @@ void frqtr(double *c1, int m1, double *c2, int m2, double a)
 
 /******************************************************************
 
-    $Id: sptk_sub.cc,v 1.2 2005/05/20 22:14:40 awb Exp $
+    $Id: sptk_sub.cc,v 1.1.1.1 2009/06/14 17:05:49 awb Exp $
 
     Subroutine for Solving a Toeplitz plus Hankel		
 	Coefficient Matrix System of Equations  ( T + H ) a = b	

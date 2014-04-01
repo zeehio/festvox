@@ -48,24 +48,24 @@
 
 #include "vector.h"
 
-extern void fvoper(FVECTOR a, char *op, FVECTOR b);
-extern void dvoper(DVECTOR a, char *op, DVECTOR b);
-extern FVECTOR xfvoper(FVECTOR a, char *op, FVECTOR b);
-extern DVECTOR xdvoper(DVECTOR a, char *op, DVECTOR b);
+extern void fvoper(FVECTOR a, const char *op, FVECTOR b);
+extern void dvoper(DVECTOR a, const char *op, DVECTOR b);
+extern FVECTOR xfvoper(FVECTOR a, const char *op, FVECTOR b);
+extern DVECTOR xdvoper(DVECTOR a, const char *op, DVECTOR b);
 
-extern void fvscoper(FVECTOR a, char *op, float t);
-extern void dvscoper(DVECTOR a, char *op, double t);
-extern FVECTOR xfvscoper(FVECTOR a, char *op, float t);
-extern DVECTOR xdvscoper(DVECTOR a, char *op, double t);
+extern void fvscoper(FVECTOR a, const char *op, float t);
+extern void dvscoper(DVECTOR a, const char *op, double t);
+extern FVECTOR xfvscoper(FVECTOR a, const char *op, float t);
+extern DVECTOR xdvscoper(DVECTOR a, const char *op, double t);
 
-extern void svoper(SVECTOR a, char *op, SVECTOR b);
-extern void lvoper(LVECTOR a, char *op, LVECTOR b);
-extern SVECTOR xsvoper(SVECTOR a, char *op, SVECTOR b);
-extern LVECTOR xlvoper(LVECTOR a, char *op, LVECTOR b);
-extern void svscoper(SVECTOR a, char *op, double t);
-extern void lvscoper(LVECTOR a, char *op, double t);
-extern SVECTOR xsvscoper(SVECTOR a, char *op, double t);
-extern LVECTOR xlvscoper(LVECTOR a, char *op, double t);
+extern void svoper(SVECTOR a, const char *op, SVECTOR b);
+extern void lvoper(LVECTOR a, const char *op, LVECTOR b);
+extern SVECTOR xsvoper(SVECTOR a, const char *op, SVECTOR b);
+extern LVECTOR xlvoper(LVECTOR a, const char *op, LVECTOR b);
+extern void svscoper(SVECTOR a, const char *op, double t);
+extern void lvscoper(LVECTOR a, const char *op, double t);
+extern SVECTOR xsvscoper(SVECTOR a, const char *op, double t);
+extern LVECTOR xlvscoper(LVECTOR a, const char *op, double t);
 
 extern void svabs(SVECTOR x);
 extern void lvabs(LVECTOR x);
@@ -110,9 +110,9 @@ extern LVECTOR xfvfind(FVECTOR x);
 extern LVECTOR xdvfind(DVECTOR x);
 
 extern DVECTOR xdvfindv(DVECTOR x);
-extern DVECTOR xdvsceval(DVECTOR x, char *op, double t);
-extern LVECTOR xdvscfind(DVECTOR x, char *op, double t);
-extern DVECTOR xdvscfindv(DVECTOR x, char *op, double t);
+extern DVECTOR xdvsceval(DVECTOR x, const char *op, double t);
+extern LVECTOR xdvscfind(DVECTOR x, const char *op, double t);
+extern DVECTOR xdvscfindv(DVECTOR x, const char *op, double t);
 
 extern void lvcumsum(LVECTOR x);
 extern void fvcumsum(FVECTOR x);

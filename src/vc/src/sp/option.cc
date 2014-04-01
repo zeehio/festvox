@@ -65,11 +65,11 @@
 /*
  *	get basic name
  */
-char *getbasicname(char *name)
+const char *getbasicname(const char *name)
 {
     int i;
     int len;
-    char *string;
+    const char *string;
 
     if (name == NULL || *name == NUL)
 	return NULL;
@@ -94,9 +94,9 @@ char *getbasicname(char *name)
 /*
  *	get allocated basic name
  */
-char *xgetbasicname(char *name)
+char *xgetbasicname(const char *name)
 {
-    char *string;
+    const char *string;
     char *basicname;
 
     if (name == NULL || *name == NUL)
@@ -111,7 +111,7 @@ char *xgetbasicname(char *name)
 /*
  *	get directory name
  */
-char *xgetdirname(char *filename)
+char *xgetdirname(const char *filename)
 {
     char *p;
     char *dirname;
@@ -224,7 +224,7 @@ char *xgetdirname(char *filename)
     return exactname;
 }
 */
-char *xgetexactname(char *name)
+char *xgetexactname(const char *name)
 {
     int len;
     char *exactname;
@@ -471,7 +471,7 @@ va_dcl
 /*
  *	print help
  */
-void printhelp(OPTIONS options, char *format, ...)
+void printhelp(OPTIONS options, const char *format, ...)
 {
     va_list args;
     char buf[MAX_LINE];
@@ -490,7 +490,7 @@ void printhelp(OPTIONS options, char *format, ...)
 /*
  *	print error
  */
-void printerr(OPTIONS options, char *format, ...)
+void printerr(OPTIONS options, const char *format, ...)
 {
     va_list args;
     char message[MAX_LINE];

@@ -46,7 +46,8 @@ DIRNAME=src/vc/scripts
 BUILD_DIRS = 
 ALL_DIRS= GMMMAP
 
-FILES = Makefile VConv.csh VConvFestival.csh VCTrain VOICE_transform.scm
+FILES = Makefile VConv.csh VConvFestival.csh VCTrain VOICE_transform.scm \
+        get_f0mcep VConvFestival_cg.csh
 
 ALL = 
 

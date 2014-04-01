@@ -46,15 +46,15 @@
 
 LANG=C; export LANG
 
-  festival -b festvox/build_clunits.scm "(set! INST_LANG_VOX::build_stage 'phone)" '(build_clunits "etc/al2.data")'
+  festival -b festvox/build_clunits.scm "(set! INST_LANG_VOX::build_stage 'phone)" '(build_clunits "etc/txt.done.data.train")'
   cp -p festival/trees/INST_LANG_VOX.tree festival/trees/INST_LANG_VOX.phone.tree 
   cp -p festival/clunits/INST_LANG_VOX.catalogue festival/clunits/INST_LANG_VOX.phone.catalogue
 
-  festival -b festvox/build_clunits.scm "(set! INST_LANG_VOX::build_stage 'diphone)" '(build_clunits "etc/al2.data")'
+  festival -b festvox/build_clunits.scm "(set! INST_LANG_VOX::build_stage 'diphone)" '(build_clunits "etc/txt.done.data.train")'
   cp -p festival/trees/INST_LANG_VOX.tree festival/trees/INST_LANG_VOX.diphone.tree 
   cp -p festival/clunits/INST_LANG_VOX.catalogue festival/clunits/INST_LANG_VOX.diphone.catalogue
 
-  festival -b festvox/build_clunits.scm "(set! INST_LANG_VOX::build_stage 'syllable)" '(build_clunits "etc/al2.data")'
+  festival -b festvox/build_clunits.scm "(set! INST_LANG_VOX::build_stage 'syllable)" '(build_clunits "etc/txt.done.data.train")'
   cp -p festival/trees/INST_LANG_VOX.tree festival/trees/INST_LANG_VOX.syl.tree 
   cp -p festival/clunits/INST_LANG_VOX.catalogue festival/clunits/INST_LANG_VOX.syl.catalogue
 

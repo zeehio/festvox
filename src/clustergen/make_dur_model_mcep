@@ -3,7 +3,7 @@
 ##                                                                       ##
 ##                   Carnegie Mellon University and                      ##
 ##                   Alan W Black and Kevin A. Lenzo                     ##
-##                      Copyright (c) 1998-2000                          ##
+##                      Copyright (c) 1998-2006                          ##
 ##                        All Rights Reserved.                           ##
 ##                                                                       ##
 ##  Permission is hereby granted, free of charge, to use and distribute  ##
@@ -44,7 +44,11 @@
 ##  This is the *whole* thing, you probably want to actually do each     ##
 ##  stage by hand (the training itself can takes days)                   ##
 ##                                                                       ##
+##  This is modified from make_dur_model, this version is for clustergen ##
+##                                                                       ##
 ###########################################################################
+
+LANG=C; export LANG
 
 #  if [ $# != 3 ]
 #  then
@@ -84,7 +88,7 @@ if [ $# = 1 ]
 then
    PROMPTFILE=$1
 fi
-cat etc/txt.done.data |
+cat $PROMPTFILE |
 awk '{printf("festival/utts_hmm/%s.utt\n",$2)}' >utthmmfile
 
 SIODHEAPSIZE=5000000
@@ -92,24 +96,29 @@ export SIODHEAPSIZE
 
 ## find the means and stddev for durations in database
 echo ";;; Finding mean durations and standard deviation of each phone type"
-$DURMEANSTD -relation HMMstate -output festival/dur/etc/durs.meanstd -from_file utthmmfile
+$DURMEANSTD -relation HMMstate -output festival/dur/etc/durs.meanstd -from_file utthmmfile || exit -1
 
 ## extract the features
 echo ";;; Extracting features from utterances"
 find festival/dur/feats -name *.feats -exec rm {} \;
-$DUMPFEATS -relation HMMstate -eval $VOICESCM -eval $VOICENAME -feats festival/dur/etc/statedur.feats -output festival/dur/feats/%s.feats -eval festival/dur/etc/logdurn.scm -from_file utthmmfile
+$DUMPFEATS -relation HMMstate -eval $VOICESCM -eval $VOICENAME -feats festival/dur/etc/statedur.feats -output festival/dur/feats/%s.feats -eval festival/dur/etc/logdurn.scm -from_file utthmmfile || exit -1
 
 ## Save all features in one file removing silence phones
 echo ";;; Collecting features in training and test data"
-find festival/dur/feats -name *.feats -exec cat {} \; |
-awk '{if ($2 != "'$SILENCENAME'") print $0}' >festival/dur/data/dur.data
+cat utthmmfile |
+while read x
+do
+  fname=`basename $x .utt`
+  cat festival/dur/feats/$fname.feats |
+  awk '{if ($2 != "'$SILENCENAME'") print $0}'
+done >festival/dur/data/dur.data
 bin/traintest festival/dur/data/dur.data
 bin/traintest festival/dur/data/dur.data.train
 
 # Build description file
 echo ";;; Build feature description file"
 $ESTDIR/bin/make_wagon_desc festival/dur/data/dur.data festival/dur/etc/statedur.feats festival/dur/etc/dur.desc
-$ESTDIR/../festival/bin/festival -b --heap 2000000 festvox/build_prosody.scm $VOICESCM $VOICENAME '(build_dur_feats_desc)'
+$ESTDIR/../festival/bin/festival --heap 20000000 -b festvox/build_prosody.scm $VOICESCM $VOICENAME '(build_dur_feats_desc)'
 
 # emacs festival/dur/etc/dur.desc
 
@@ -118,14 +127,14 @@ PREF=dur
 
 (
 echo ";;; Build the duration model itself"
-$WAGON -data festival/dur/data/dur.data.train.train -desc festival/dur/etc/dur.desc -test festival/dur/data/dur.data.train.test -stop $STOP -output festival/dur/tree/$PREF.S$STOP.tree
+$WAGON -data festival/dur/data/dur.data.train.train -desc festival/dur/etc/dur.desc -test festival/dur/data/dur.data.train.test -stop $STOP -output festival/dur/tree/$PREF.S$STOP.tree || exit -1
 
 echo ";;; Test the duration model"
-$WAGON_TEST -heap 2000000 -data festival/dur/data/dur.data.test -desc festival/dur/etc/dur.desc -tree festival/dur/tree/$PREF.S$STOP.tree ) |
+$WAGON_TEST -heap 10000000 -data festival/dur/data/dur.data.test -desc festival/dur/etc/dur.desc -tree festival/dur/tree/$PREF.S$STOP.tree ) |
 tee dur.$PREF.S$STOP.out
 
 echo ";;; Constructing the duration model as a loadable scheme file"
-$ESTDIR/../festival/bin/festival -b --heap 2000000 festvox/build_prosody.scm $VOICESCM $VOICENAME '(finalize_dur_model "'$MODELNAME'" "'$PREF.S$STOP.tree'")'
+$ESTDIR/../festival/bin/festival --heap 20000000 -b festvox/build_prosody.scm $VOICESCM $VOICENAME '(finalize_dur_model "'$MODELNAME'" "'$PREF.S$STOP.tree'")'
 
 exit
 

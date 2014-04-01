@@ -1,7 +1,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;                                                                     ;;;
 ;;;                     Carnegie Mellon University                      ;;;
-;;;                      Copyright (c) 1998-2005                        ;;;
+;;;                      Copyright (c) 1998-2011                        ;;;
 ;;;                        All Rights Reserved.                         ;;;
 ;;;                                                                     ;;;
 ;;; Permission is hereby granted, free of charge, to use and distribute ;;;
@@ -76,10 +76,10 @@
 ;;;  Code specific to the clustergen waveform synthesis method
 ;;;
 
-(set! cluster_synth_method 
-  (if (boundp 'mlsa_resynthesis)
-      cg_wave_synth
-      cg_wave_synth_external ))
+;(set! cluster_synth_method 
+;  (if (boundp 'mlsa_resynthesis)
+;      cg_wave_synth
+;      cg_wave_synth_external ))
 
 ;;; Flag to save multiple loading of db
 (defvar INST_LANG_VOX::cg_loaded nil)
@@ -125,9 +125,6 @@
        '(name INST_LANG_VOX)
        '(index_name INST_LANG_VOX)
        '(trees_dir "festival/trees/")
-       '(catalogue_dir "festival/clunits/")
-       '(coeffs_dir "ccoefs/")
-       '(coeffs_ext ".mcep")
        '(clunit_name_feat lisp_INST_LANG_VOX::cg_name)
 ))
 
@@ -217,29 +214,78 @@ Function that actual loads in the databases and selection trees.
 SHould only be called once per session."
   (set! dt_params INST_LANG_VOX::dt_params)
   (set! clustergen_params INST_LANG_VOX::dt_params)
-  (set! INST_LANG_VOX::param_vectors
-        (track.load
-	 (string-append 
-	  INST_LANG_VOX::dir "/"
-	  (get_param 'trees_dir dt_params "trees/")
-	  (get_param 'index_name dt_params "all")
-	  "_mcep.params")))
-  (set! INST_LANG_VOX::clustergen_mcep_trees
-        (load (string-append
+  (if cg:multimodel
+      (begin
+        ;; Multimodel: separately trained statics and deltas
+        (set! INST_LANG_VOX::static_param_vectors
+              (track.load
                (string-append 
                 INST_LANG_VOX::dir "/"
                 (get_param 'trees_dir dt_params "trees/")
                 (get_param 'index_name dt_params "all")
-                "_mcep.tree")) t))
-
-  (if (null (assoc 'cg::trajectory INST_LANG_VOX::clustergen_mcep_trees))
-      (set! INST_LANG_VOX::clustergen_f0_trees
-            (load (string-append
-                   (string-append 
-                    INST_LANG_VOX::dir "/"
-                    (get_param 'trees_dir dt_params "trees/")
-                    (get_param 'index_name dt_params "all")
-                    "_f0.tree")) t)))
+                "_mcep_static.params")))
+        (set! INST_LANG_VOX::clustergen_static_mcep_trees
+              (load (string-append 
+                     INST_LANG_VOX::dir "/"
+                     (get_param 'trees_dir dt_params "trees/")
+                     (get_param 'index_name dt_params "all")
+                     "_mcep_static.tree") t))
+        (set! INST_LANG_VOX::delta_param_vectors
+              (track.load
+               (string-append 
+                INST_LANG_VOX::dir "/"
+                (get_param 'trees_dir dt_params "trees/")
+                (get_param 'index_name dt_params "all")
+                "_mcep_delta.params")))
+        (set! INST_LANG_VOX::clustergen_delta_mcep_trees
+              (load (string-append 
+                     INST_LANG_VOX::dir "/"
+                     (get_param 'trees_dir dt_params "trees/")
+                     (get_param 'index_name dt_params "all")
+                     "_mcep_delta.tree") t))
+        (set! INST_LANG_VOX::str_param_vectors
+              (track.load
+               (string-append
+                INST_LANG_VOX::dir "/"
+                (get_param 'trees_dir dt_params "trees/")
+                (get_param 'index_name dt_params "all")
+                "_str.params")))
+        (set! INST_LANG_VOX::clustergen_str_mcep_trees
+              (load (string-append
+                     INST_LANG_VOX::dir "/"
+                     (get_param 'trees_dir dt_params "trees/")
+                     (get_param 'index_name dt_params "all")
+                     "_str.tree") t))
+        (if (null (assoc 'cg::trajectory INST_LANG_VOX::clustergen_static_mcep_trees))
+            (set! INST_LANG_VOX::clustergen_f0_trees
+                  (load (string-append 
+                          INST_LANG_VOX::dir "/"
+                          (get_param 'trees_dir dt_params "trees/")
+                          (get_param 'index_name dt_params "all")
+                          "_f0.tree") t)))
+        )
+      (begin
+        ;; Single joint model 
+        (set! INST_LANG_VOX::param_vectors
+              (track.load
+               (string-append 
+                INST_LANG_VOX::dir "/"
+                (get_param 'trees_dir dt_params "trees/")
+                (get_param 'index_name dt_params "all")
+                "_mcep.params")))
+        (set! INST_LANG_VOX::clustergen_mcep_trees
+              (load (string-append 
+                      INST_LANG_VOX::dir "/"
+                      (get_param 'trees_dir dt_params "trees/")
+                      (get_param 'index_name dt_params "all")
+                      "_mcep.tree") t))
+        (if (null (assoc 'cg::trajectory INST_LANG_VOX::clustergen_mcep_trees))
+            (set! INST_LANG_VOX::clustergen_f0_trees
+                  (load (string-append 
+                         INST_LANG_VOX::dir "/"
+                         (get_param 'trees_dir dt_params "trees/")
+                         (get_param 'index_name dt_params "all")
+                         "_f0.tree") t)))))
 
   (set! INST_LANG_VOX::cg_loaded t)
 )
@@ -300,8 +346,20 @@ Define voice for LANG."
       (begin
 	(if (not INST_LANG_VOX::cg_loaded)
 	    (INST_LANG_VOX::cg_load))
-        (set! clustergen_param_vectors INST_LANG_VOX::param_vectors)
-	(set! clustergen_mcep_trees INST_LANG_VOX::clustergen_mcep_trees)
+        (if cg:multimodel
+            (begin
+              (set! clustergen_param_vectors INST_LANG_VOX::static_param_vectors)
+              (set! clustergen_mcep_trees INST_LANG_VOX::clustergen_static_mcep_trees)
+              (set! clustergen_delta_param_vectors INST_LANG_VOX::delta_param_vectors)
+              (set! clustergen_delta_mcep_trees INST_LANG_VOX::clustergen_delta_mcep_trees)
+              (set! clustergen_str_param_vectors INST_LANG_VOX::str_param_vectors)
+              (set! clustergen_str_mcep_trees INST_LANG_VOX::clustergen_str_mcep_trees)
+
+              )
+            (begin
+              (set! clustergen_param_vectors INST_LANG_VOX::param_vectors)
+              (set! clustergen_mcep_trees INST_LANG_VOX::clustergen_mcep_trees)
+              ))
         (if (boundp 'INST_LANG_VOX::clustergen_f0_trees)
             (set! clustergen_f0_trees INST_LANG_VOX::clustergen_f0_trees))
 	(Parameter.set 'Synth_Method 'ClusterGen)

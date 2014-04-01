@@ -49,7 +49,7 @@
 #include "vector.h"
 #include "matrix.h"
 
-extern long getfilesize(char *filename, int headlen);
+extern long getfilesize(const char *filename, int headlen);
 
 extern void swapshort(short *data, long length);
 extern void swaplong(long *data, long length);
@@ -67,38 +67,38 @@ extern void fwritefloat(float *data, long length, int swap, FILE *fp);
 extern void fwritedouble(double *data, long length, int swap, FILE *fp);
 extern void fwritedoubletos(double *data, long length, int swap, FILE *fp);
 
-extern SVECTOR xreadssignal(char *filename, int headlen, int swap);
-extern FVECTOR xreadfsignal(char *filename, int headlen, int swap);
-extern DVECTOR xdvreadssignal(char *filename, int headlen, int swap);
-extern DVECTOR xreaddsignal(char *filename, int headlen, int swap);
-extern DVECTOR xreadf2dsignal(char *filename, int headlen, int swap);
-extern void writessignal(char *filename, SVECTOR vector, int swap);
-extern void dvwritessignal(char *filename, DVECTOR vector, int swap);
-extern void writedsignal(char *filename, DVECTOR vector, int swap);
-extern void writed2fsignal(char *filename, DVECTOR vector, int swap);
+extern SVECTOR xreadssignal(const char *filename, int headlen, int swap);
+extern FVECTOR xreadfsignal(const char *filename, int headlen, int swap);
+extern DVECTOR xdvreadssignal(const char *filename, int headlen, int swap);
+extern DVECTOR xreaddsignal(const char *filename, int headlen, int swap);
+extern DVECTOR xreadf2dsignal(const char *filename, int headlen, int swap);
+extern void writessignal(const char *filename, SVECTOR vector, int swap);
+extern void dvwritessignal(const char *filename, DVECTOR vector, int swap);
+extern void writedsignal(const char *filename, DVECTOR vector, int swap);
+extern void writed2fsignal(const char *filename, DVECTOR vector, int swap);
 
-extern LMATRIX xreadlmatrix(char *filename, long ncol, int swap);
-extern DMATRIX xreaddmatrix(char *filename, long ncol, int swap);
-extern DMATRIX xreadf2dmatrix(char *filename, long ncol, int swap);
-extern void writelmatrix(char *filename, LMATRIX mat, int swap);
-extern void writedmatrix(char *filename, DMATRIX mat, int swap);
-extern void writed2fmatrix(char *filename, DMATRIX mat, int swap);
+extern LMATRIX xreadlmatrix(const char *filename, long ncol, int swap);
+extern DMATRIX xreaddmatrix(const char *filename, long ncol, int swap);
+extern DMATRIX xreadf2dmatrix(const char *filename, long ncol, int swap);
+extern void writelmatrix(const char *filename, LMATRIX mat, int swap);
+extern void writedmatrix(const char *filename, DMATRIX mat, int swap);
+extern void writed2fmatrix(const char *filename, DMATRIX mat, int swap);
 
-extern long getfilesize_txt(char *filename);
-extern int readdvector_txt(char *filename, DVECTOR vector);
-extern DVECTOR xreaddvector_txt(char *filename);
-extern int writedvector_txt(char *filename, DVECTOR vector);
+extern long getfilesize_txt(const char *filename);
+extern int readdvector_txt(const char *filename, DVECTOR vector);
+extern DVECTOR xreaddvector_txt(const char *filename);
+extern int writedvector_txt(const char *filename, DVECTOR vector);
 
-extern int getnumrow_txt(char *filename);
-extern int getnumcol_txt(char *filename);
+extern int getnumrow_txt(const char *filename);
+extern int getnumcol_txt(const char *filename);
 extern int fgetcol_txt(char *buf, int col, FILE *fp);
-extern int sgetcol(char *buf, int col, char *line);
+extern int sgetcol(char *buf, int col, const char *line);
 extern int fgetline(char *buf, FILE *fp);
 extern int getline(char *buf);
-extern char *gets0(char *buf, int size);
+extern const char *gets0(const char *buf, int size);
 extern int sscanf_setup(char *line, char *name, char *value);
-extern int dvreadcol_txt(char *filename, int col, DVECTOR vector);
-extern DVECTOR xdvreadcol_txt(char *filename, int col);
+extern int dvreadcol_txt(const char *filename, int col, DVECTOR vector);
+extern DVECTOR xdvreadcol_txt(const char *filename, int col);
 
 #define fgetnumrow getnumrow_txt
 #define fgetnumcol getnumcol_txt
@@ -139,10 +139,10 @@ extern void dvnfdump(FILE *fp, DVECTOR vec, ...);
 #define getfsiglen(filename, headlen) (getsiglen(filename, headlen, float))
 #define getdsiglen(filename, headlen) (getsiglen(filename, headlen, double))
 
-extern void check_dir(char *file);
-extern long get_dnum_file(char *file, long dim);
-extern long get_fnum_file(char *file, long dim);
-extern long get_lnum_file(char *file, long dim);
+extern void check_dir(const char *file);
+extern long get_dnum_file(const char *file, long dim);
+extern long get_fnum_file(const char *file, long dim);
+extern long get_lnum_file(const char *file, long dim);
 
 
 #endif /* __FILEIO_H */
