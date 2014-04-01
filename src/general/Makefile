@@ -74,7 +74,7 @@ ESTLIBS=-L$(ESTDIR)/lib -lestools -lestbase -leststring $(COMPILERLIBS) -lm $(OS
 
 CXXFLAGS += -O2 $(ESTINC)
 
-LOCAL_CLEAN = phonealign fix_pm smooth_f0 powcont_norm
+LOCAL_CLEAN = phonealign fix_pm smooth_f0 powcont_norm find_unknowns
 
 phonealign: phonealign_main.o $(LIBDEPS)
 	$(strip $(LINK_COMMAND)) -o phonealign phonealign_main.o $(ESTLIBS)
