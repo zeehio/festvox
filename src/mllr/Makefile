@@ -51,6 +51,6 @@ ALL = mllr
 include $(TOP)/config/common_make_rules
 
 mllr: mllr.cc
-	g++ -Wall -o mllr mllr.cc
+	$(CXX) -Wall -o mllr mllr.cc
 
 
