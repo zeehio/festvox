@@ -53,7 +53,7 @@ extern void sp_warn_off(void);
 
 /*extern double randun(void);
 extern double gauss(double mu, double sigma);*/
-extern double round(double x);
+double round(double x);
 extern double fix(double x);
 extern double rem(double x, double y);
 extern void cexpf(float *xr, float *xi);

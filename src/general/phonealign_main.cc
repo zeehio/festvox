@@ -43,6 +43,8 @@
 #include <EST.h>
 #include <EST_math.h>
 
+using namespace std;
+
 static double frame_distance(const EST_Track &itrack, int i,
 			     const EST_Track &otrack, int j);
 static int aligntracks(const EST_Track &itrack,

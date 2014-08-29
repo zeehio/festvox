@@ -63,7 +63,7 @@ int main(int argc,char **argv)
     EST_StrList files;
     EST_String silences;
     EST_Utterance utt; /* to hold labels */
-    int i;
+    ssize_t i;
 
     parse_command_line
 	(argc,argv,
@@ -246,7 +246,7 @@ static void interpolate(const EST_Track &c,
 {
     // Interpolate between unvoiced sections, and ensure breaks
     // during silences
-    int i, n, p;
+    ssize_t i, n, p;
     float m;
     float n_val, p_val;
 
@@ -303,7 +303,7 @@ static void pm_to_f0(const EST_Track &pm, EST_Track &f0,
 		     float minf0, float shift)
 {
     // Converts a pm to a fixed framed F0 track.
-    int i,pm_pos;
+    ssize_t i,pm_pos;
     float maxshift;
 
     f0.resize((int)(pm.end()/shift),2);

@@ -34,6 +34,11 @@
 ##                                                                       ##
 ###########################################################################
 
+# This is the default rule
+all:	.make_build_dirs $(ALL)
+	@ : Do nothing but shut up make
+
+
 #  Include project specific rules
 
 -include $(TOP)/config/project.mak
@@ -50,7 +55,7 @@ ifeq ($(SYSTEM_LOADED),)
 	OSREV=
 endif
 
-all: .make_build_dirs $(ALL) nothing
+#all: .make_build_dirs $(ALL) nothing
 
 nothing:
 	@ echo > /dev/null

@@ -428,6 +428,7 @@ void Get_FrameRate(char *file, double& shft, double& sf, double& size) {
 
 void NewProcess(int *path, int **pbuf, int *wrdB, int *nullI, int *stMap,
                 stC *hst, int ns, int nt, int lastS) {
+  (void) ns;
   int mas, sid, t;
   t = nt - 1;
   mas = -1;
@@ -452,14 +453,16 @@ void NewProcess(int *path, int **pbuf, int *wrdB, int *nullI, int *stMap,
 void PostProcess(int *path, int *stMap, int ns, int nt, ofstream& fp_log,
                  char *fnm, int *list, int ltar, int *wrdB) {
   // int prev = list[0]; //Assign the first word-id of list[0]...
-
+  (void) ns;
+  (void) list;
+  (void)ltar;
   int sid;
   int wid;
   int s;
   double tim = 0;
   // double pT = 0;
 
-  int uno = 0;
+  //int uno = 0;
 
   // char labD[] = "lab/";
 
@@ -493,7 +496,7 @@ void PostProcess(int *path, int *stMap, int ns, int nt, ofstream& fp_log,
     fp_log << fnm << endl;
   }
 
-  uno = 0;
+  //uno = 0;
 
   s = path[0];
   ps = s;
@@ -671,6 +674,12 @@ void LoadBinaryFeatFile(char *filename, double*** feats_ptr,
   double** feats;
   double feat;
 
+  if (*num_cols < 0) {
+    cout << "Error: negative number of columns on: "
+         << filename << endl;
+    cout << "Aborting." << endl;
+    exit(-1);
+  }
   input_file = fopen(filename, "rb");
   if (input_file == NULL) {
     cout << "Error opening file: "
@@ -679,13 +688,28 @@ void LoadBinaryFeatFile(char *filename, double*** feats_ptr,
     exit(-1);
   }
 
-  fread(num_rows, sizeof(*num_rows), 1, input_file);
-  fread(num_cols, sizeof(*num_cols), 1, input_file);
+  if (fread(num_rows, sizeof(*num_rows), 1, input_file) != 1) {
+    cout << "Error reading file: "
+         << filename << endl;
+    cout << "Aborting." << endl;
+    exit(-1);
+  }
+  if (fread(num_cols, sizeof(*num_cols), 1, input_file) != 1) {
+    cout << "Error reading file: "
+         << filename << endl;
+    cout << "Aborting." << endl;
+    exit(-1);
+  }
 
   feats = new double*[*num_rows];
   for (int row = 0; row < *num_rows; row++) {
     feats[row] = new double[*num_cols];
-    fread(feats[row], sizeof(feat), *num_cols, input_file);
+    if (fread(feats[row], sizeof(feat), *num_cols, input_file) != (size_t) *num_cols) {
+		cout << "Error reading file: "
+			 << filename << endl;
+		cout << "Aborting." << endl;
+		exit(-1);
+	}
   }
   *feats_ptr = feats;
   fclose(input_file);
@@ -694,6 +718,7 @@ void LoadBinaryFeatFile(char *filename, double*** feats_ptr,
 
 void Emissions(wrdC *hwrd, stC *hst, double**& emt, int& er, int& ec,
                double **ft, int fr, int fc, int *tar, int ltar, int*& stMap) {
+  (void)fc;
   int tw;
   int bs;
   int sid;
@@ -796,12 +821,13 @@ void FillStateTrans(double **arcW, int *tar, int ltar, int *nullI) {
 
 void FillWordTrans(double **arcW, int *tar, int ltar, double **trw,
                    int *bI, int *eI, int**& fwM, int**& bwM, int er) {
+  (void)trw;
   int rn;
   int tw;
   int bs;
   int es;
-  int cw;
-  int nw;
+  //int cw;
+  //int nw;
 
   int *esa;
   int *bsa;
@@ -809,7 +835,7 @@ void FillWordTrans(double **arcW, int *tar, int ltar, double **trw,
 
   int nos;
 
-  double sum;
+  //double sum;
   double estrn;
   double bias;
 
@@ -836,7 +862,7 @@ void FillWordTrans(double **arcW, int *tar, int ltar, double **trw,
 
   for (int i = 0; i < ltar; i++) {
     es = esa[i];
-    cw = wa[i];
+    //cw = wa[i];
 
     /*This code stops transition leaks, if any.. */
     // sum = 0;     //Compute the summations of the remianing trans.
@@ -846,7 +872,7 @@ void FillWordTrans(double **arcW, int *tar, int ltar, double **trw,
     //  sum += trw[cw][nw];
     //  }
 
-    sum = 0;
+    //sum = 0;
     estrn = arcW[es][es];  // Take end state transition
     if (0 != estrn) {
       cout << "ESTRN SHOULD HAVE BEEN ZERO ALWAYS..." << endl;
@@ -859,7 +885,7 @@ void FillWordTrans(double **arcW, int *tar, int ltar, double **trw,
     // ltar + 1 is for self-transition.
     for (int j = 0; j < ltar; j++) {
       bs = bsa[j];
-      nw = wa[j];
+      //nw = wa[j];
       // arcW[es][bs] = trw[cw][nw] + bias;
       arcW[es][bs] = bias;
     }
@@ -933,6 +959,7 @@ int Viterbi(double **emt, int r, int c, double **trp,
             double **alp, double **bet, double *nrmF,
             int *bI, int *eI, int *path, int **fwM, int **bwM,
             int *nullI, int **pbuf, int& lastS) {
+  (void)bet;
   int ns;
   int nt;
   int t;
@@ -1098,6 +1125,9 @@ int Viterbi_Seq(double **emt, int r, int c, double **trp,
                 double **alp, double **bet, double *nrmF,
                 int *bI, int *eI, int *path, int **fwM, int **bwM,
                 int *nullI, int **pbuf, int &lastS) {
+  (void)bet;
+  (void) bI;
+  (void) eI;
   int ns;
   int nt;
   int t;
@@ -1252,6 +1282,9 @@ int Viterbi_Seq_nde(double **emt, int r, int c, double **trp,
                     double **alp, double **bet, double *nrmF,
                     int *bI, int *eI, int *path, int **fwM, int **bwM,
                     int *nullI, int **pbuf, int &lastS) {
+  (void) eI;
+  (void) bI;
+  (void) bet;
   int ns;
   int nt;
   int t;
@@ -1414,6 +1447,7 @@ void FillWordTrans_Seq(double **arcW, int *tar, int ltar,
                        double **trw, int *bI, int *eI,
                        int**& fwM, int**& bwM, int er) {
   // There is no need of trw matrix here....
+  (void) trw;
   int rn;
   int tw;
   int bs;

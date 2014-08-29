@@ -38,6 +38,7 @@
 /*************************************************************************/
 
 #include "EST.h"
+using namespace std;
 
 static void find_meanstd(EST_Track &ss, EST_StrList &files);
 static void cep_normalize(EST_Track &tt, const EST_Track &ss, EST_Relation &rr);

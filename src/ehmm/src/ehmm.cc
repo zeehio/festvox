@@ -406,6 +406,7 @@ int main(int argc, char *argv[]) {
 
 void RemoveShortPauses(int*& tarM, int& lenM,
                        int *srcA, int srcL, int itr, int ssF) {
+  (void) itr;
   Alloc1d(tarM, srcL);
 
   // if (itr < _citr) {
@@ -658,14 +659,14 @@ void BuildEnv(char *fnm, wrdC*& hwrd, stC*& hst, int& now, int& tst, int& dim) {
   int t_bs;
   int t_es;
   int t_noc;
-  int skipF = 0;
+  //int skipF = 0;
 
   int conBS;
   int t_nullF;
 
 
   for (int i = 0; i < now; i++) {
-    skipF = 0;
+    //skipF = 0;
     fp_in >> wid >> nm >> nst >> noc >> nog;
     fp_pl << nm << " " << nst << " ";
 
@@ -838,13 +839,29 @@ void LoadBinaryFeatFile(char *filename, double*** feats_ptr,
     exit(-1);
   }
 
-  fread(num_rows, sizeof(*num_rows), 1, input_file);
-  fread(num_cols, sizeof(*num_cols), 1, input_file);
+  if (fread(num_rows, sizeof(*num_rows), 1, input_file) != 1) {
+    cout << "Error reading file: "
+         << filename << endl;
+    cout << "Aborting." << endl;
+    exit(-1);
+  }
+
+  if (fread(num_cols, sizeof(*num_cols), 1, input_file) != 1) {
+    cout << "Error reading file: "
+         << filename << endl;
+    cout << "Aborting." << endl;
+    exit(-1);
+  }
 
   feats = new double*[*num_rows];
   for (int row = 0; row < *num_rows; row++) {
     feats[row] = new double[*num_cols];
-    fread(feats[row], sizeof(feat), *num_cols, input_file);
+	if(fread(feats[row], sizeof(feat), *num_cols, input_file) != (size_t) *num_cols) {
+		cout << "Error reading file: "
+			 << filename << endl;
+		cout << "Aborting." << endl;
+		exit(-1);
+	}
   }
   *feats_ptr = feats;
   fclose(input_file);
@@ -853,6 +870,7 @@ void LoadBinaryFeatFile(char *filename, double*** feats_ptr,
 void Emissions(wrdC *hwrd, stC *hst, double**& emt,
                int& er, int& ec, double **ft,
                int fr, int fc, int *tar, int ltar, int*& stMap) {
+  (void) fc;
   int tw;
   int bs;
   int sid;
@@ -1173,7 +1191,7 @@ void AccumScores(double **emt, int er, int ec,
                  int *bI, int *eI, double **trx, double *denW ,
                  int *begR, int **fwM, int *nullI)  {
   // cout<<"In Accumscores... "<<endl;
-
+  (void) fc;
   // int fr = ec;
   int nt = ec;
   int ns = er;
@@ -1264,6 +1282,7 @@ void AccumScores(double **emt, int er, int ec,
 
 void AccumWordTran(double *gtrn, int s, int *bI, int ns,
                    double **trx, double *denW, int *stMap) {
+  (void) denW;
   int sid = stMap[s];
   int wid = hst[sid].getwid();
 
@@ -1315,7 +1334,7 @@ void FillWordTrans_Seq(double **arcW, int *tar, int ltar,
                        double **trw, int *bI, int *eI,
                        int**& fwM, int**& bwM, int er, int ssilF) {
   // There is no need of trw matrix here....
-
+  (void) trw;
   int rn;
   int tw;
   int bs;
@@ -1489,6 +1508,8 @@ double AlphaBetas_Seq(double **emt, int r, int c,
                       double ** trp, double **alp, double **bet,
                       double *nrmF, int *bI, int *eI,
                       int **fwM, int **bwM, int *nullI, int& nanF) {
+  (void)bI;
+  (void) eI;
   int ns;
   int nt;
   int t;

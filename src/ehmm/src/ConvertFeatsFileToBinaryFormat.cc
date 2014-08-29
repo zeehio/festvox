@@ -71,17 +71,32 @@ void ConvertFileToBinaryFormat(char* input_filename, char* output_filename) {
     exit(-1);
   }
 
-  fscanf(input_file, "%d", &num_rows);
-  fscanf(input_file, "%d", &num_cols);
+  if (fscanf(input_file, "%d", &num_rows) != 1) {
+	  printf("Error reading number of rows on %s\n", input_filename);
+	  exit(-1);
+  }
+  if (fscanf(input_file, "%d", &num_cols) != 1) {
+	  printf("Error reading number of columns on %s\n", input_filename);
+	  exit(-1);
+  }
 
-  fwrite(&num_rows, sizeof(num_rows), 1, output_file);
-  fwrite(&num_cols, sizeof(num_cols), 1, output_file);
 
+  if (fwrite(&num_rows, sizeof(num_rows), 1, output_file) != 1) {
+	  printf("Error writing number of rows on %s\n", output_filename);
+	  exit(-1);
+  }
+  if (fwrite(&num_cols, sizeof(num_cols), 1, output_file) != 1) {
+	  printf("Error writing number of columns on %s\n", output_filename);
+	  exit(-1);
+  }
   feats = new double*[num_rows];
   for (int row = 0; row < num_rows; row++) {
     feats[row] = new double[num_cols];
     for (int col = 0; col < num_cols; col++) {
-      fscanf(input_file, "%lf", &feats[row][col]);
+      if (fscanf(input_file, "%lf", &feats[row][col]) != 1) {
+		  printf("Error reading feats[%d][%d] on %s\n", row, col,input_filename);
+		  exit(-1);
+	  }
     }
   }
 
